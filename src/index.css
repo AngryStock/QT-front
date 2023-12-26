@@ -8,4 +8,5 @@ html,
 body,
 #root {
   font-family: 'Spoqa Han Sans Neo', 'Noto Sans KR', sans-serif;
+  box-sizing: border-box;
 }
