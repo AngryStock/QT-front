@@ -1,0 +1,7 @@
+.mainBackground {
+  background-image: url('./image/main_background.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: brightness(0.8);
+}

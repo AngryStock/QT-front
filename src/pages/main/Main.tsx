@@ -1,0 +1,54 @@
+import { useEffect, useRef, useState } from 'react';
+import CustomDropdown from '../../component/CustomDropdown';
+import styles from './Main.module.css';
+import LoginModal from './modal/LoginModal';
+
+function Main() {
+  let logo = useRef<HTMLDivElement>(null);
+  let [logoWidth, setLogoWidth] = useState(0);
+  let [language, setLanguage] = useState(['KR', 'EN', 'JP']);
+  let [loginModalIsOpen, setLoginModalIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (logo.current) {
+      console.log(logo.current.offsetWidth);
+      setLogoWidth(logo.current.offsetWidth);
+    }
+  }, []);
+  return (
+    <div className="h-full w-full relative">
+      {loginModalIsOpen && <LoginModal setLoginModalIsOpen={setLoginModalIsOpen} loginModalIsOpen={loginModalIsOpen} />}
+      <div className="h-full relative z-10">
+        <div className={`h-full ${styles.mainBackground} absolute top-0 right-0 bottom-0 left-0 -z-10`}></div>
+        <header className="w-full flex items-center p-4 font-bold whitespace-nowrap justify-between">
+          <div className="w-1/2">
+            <div className="w-1/4 text-white cursor-pointer hover:text-rose-300">QRORDER</div>
+          </div>
+          <div className="w-1/2 flex items-center text-center">
+            <div className="w-1/4 text-white p-2 rounded-lg cursor-pointer hover:text-rose-300">도입사례</div>
+            <div className="w-1/4 text-white p-2 rounded-lg cursor-pointer hover:text-rose-300">업체등록</div>
+            <div
+              className="w-1/4 text-white p-2 rounded-lg cursor-pointer hover:text-rose-300"
+              onClick={() => {
+                setLoginModalIsOpen(!loginModalIsOpen);
+              }}
+            >
+              로그인
+            </div>
+            <div className="w-1/4 ">
+              <CustomDropdown
+                list={language}
+                options={['center']}
+                height={10}
+                selectTextColor={'white'}
+                hoverSelctTextColor={'rose'}
+              />
+            </div>
+          </div>
+        </header>
+      </div>
+    </div>
+  );
+}
+
+export default Main;

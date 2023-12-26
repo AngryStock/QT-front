@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import CustomDropdown from './component/CustomDropdown';
+import CustomDropdown from '../../component/CustomDropdown';
 import CustomDateRangePicker from './component/CustomDateRangePicker';
 
 function Sales() {
@@ -12,16 +12,22 @@ function Sales() {
   return (
     <div className="w-full p-4">
       <div className="w-full flex mb-2">
-        <div className="w-1/3">
-          <CustomDropdown options={years} />
+        <div className="w-1/3 border border-gray-400 rounded-lg hover:bg-rose-300">
+          <CustomDropdown
+            list={years}
+            options={['between']}
+            height={12}
+            selectTextColor={''}
+            hoverSelctTextColor={''}
+          />
         </div>
         <div className="w-1/3 pl-2">
           {halfs.map((half) => {
             return (
               <button
                 className={`${
-                  tab === half ? 'bg-rose-200 font-bold' : 'none'
-                } border border-gray-400 rounded-lg h-12 p-1 w-1/2`}
+                  tab === half ? 'bg-rose-300 font-bold' : 'none'
+                } border border-gray-400 rounded-lg h-12 p-1 w-1/2 hover:bg-rose-300`}
                 onClick={() => {
                   setTab(half);
                 }}
@@ -36,8 +42,8 @@ function Sales() {
             return (
               <button
                 className={`${
-                  tab === quarter ? 'bg-rose-200 font-bold' : 'none'
-                } border border-gray-400 rounded-lg h-12 p-1 w-1/4`}
+                  tab === quarter ? 'bg-rose-300 font-bold' : 'none'
+                } border border-gray-400 rounded-lg h-12 p-1 w-1/4 hover:bg-rose-300`}
                 onClick={() => {
                   setTab(quarter);
                 }}
@@ -67,15 +73,15 @@ function Sales() {
         <div className="w-full flex text-lg items-center h-12 mb-4">
           <div className="w-1/2 font-bold relative">매출</div>
           <div className="w-1/2 flex justify-between text-center">
-            <button className="w-1/3 text-gray-400 flex justify-center items-center hover:text-rose-200">
+            <button className="w-1/3 text-gray-400 flex justify-center items-center hover:text-rose-300">
               <span>인쇄</span>
               <span className="material-symbols-outlined">print</span>
             </button>
-            <button className="w-1/3 text-gray-400 flex justify-center items-center hover:text-rose-200">
+            <button className="w-1/3 text-gray-400 flex justify-center items-center hover:text-rose-300">
               <span>상세내역 다운로드</span>
               <span className="material-symbols-outlined">download</span>
             </button>
-            <button className="w-1/3 text-gray-400 flex justify-center items-center hover:text-rose-200">
+            <button className="w-1/3 text-gray-400 flex justify-center items-center hover:text-rose-300">
               <span>이메일 보내기</span>
               <span className="material-symbols-outlined">mail</span>
             </button>
