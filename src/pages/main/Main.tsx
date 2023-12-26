@@ -1,20 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import CustomDropdown from '../../component/CustomDropdown';
 import styles from './Main.module.css';
 import LoginModal from './modal/LoginModal';
 
 function Main() {
-  let logo = useRef<HTMLDivElement>(null);
-  let [logoWidth, setLogoWidth] = useState(0);
-  let [language, setLanguage] = useState(['KR', 'EN', 'JP']);
+  let language = ['KR', 'EN', 'JP'];
   let [loginModalIsOpen, setLoginModalIsOpen] = useState(false);
 
-  useEffect(() => {
-    if (logo.current) {
-      console.log(logo.current.offsetWidth);
-      setLogoWidth(logo.current.offsetWidth);
-    }
-  }, []);
   return (
     <div className="h-full w-full relative">
       {loginModalIsOpen && <LoginModal setLoginModalIsOpen={setLoginModalIsOpen} loginModalIsOpen={loginModalIsOpen} />}
