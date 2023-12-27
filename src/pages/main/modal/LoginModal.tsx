@@ -11,7 +11,7 @@ function LoginModal({ setLoginModalIsOpen, loginModalIsOpen }: LoginModalProps) 
   return (
     <div className="absolute w-full h-full z-20 flex justify-center items-center">
       <div className="w-full h-full absolute" onClick={toggleModal}></div>
-      <div className="w-1/2 h-1/2 bg-white rounded-lg min-w-80 min-h-[500px] z-10 p-6 font-bold relative">
+      <div className="w-1/2 h-1/2 bg-white rounded-lg min-w-80 min-h-[500px] max-w-[512px] z-10 p-6 font-bold relative">
         <div className="w-full text-right">
           <button className="material-symbols-outlined cursor-pointer" onClick={toggleModal}>
             close
@@ -24,7 +24,7 @@ function LoginModal({ setLoginModalIsOpen, loginModalIsOpen }: LoginModalProps) 
             </div>
 
             <div>
-              <div className="py-2">사업자번호</div>
+              <div className="py-2">사업자등록번호</div>
               <input type="number" className="w-full h-10 border-2 rounded-lg" aria-label="사업자번호" />
             </div>
 
