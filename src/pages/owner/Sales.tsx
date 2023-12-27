@@ -22,9 +22,10 @@ function Sales() {
           />
         </div>
         <div className="w-1/3 pl-2">
-          {halfs.map((half) => {
+          {halfs.map((half, i) => {
             return (
               <button
+                key={i}
                 className={`${
                   tab === half ? 'bg-rose-300 font-bold' : 'none'
                 } border border-gray-400 rounded-lg h-12 p-1 w-1/2 hover:bg-rose-300`}
@@ -38,9 +39,10 @@ function Sales() {
           })}
         </div>
         <div className="w-1/3 pl-2">
-          {quarters.map((quarter) => {
+          {quarters.map((quarter, i) => {
             return (
               <button
+                key={i}
                 className={`${
                   tab === quarter ? 'bg-rose-300 font-bold' : 'none'
                 } border border-gray-400 rounded-lg h-12 p-1 w-1/4 hover:bg-rose-300`}
@@ -95,9 +97,9 @@ function Sales() {
           <div className="w-1/6 text-right">부가세</div>
           <div className="w-1/6 text-right">합계</div>
         </div>
-        {saleList.map((list) => {
+        {saleList.map((list, i) => {
           return (
-            <>
+            <div key={i}>
               <div className="w-full border border-grey-300"></div>
               <div className="flex my-6">
                 <div className="w-3/6">{list}</div>
@@ -105,7 +107,7 @@ function Sales() {
                 <div className="w-1/6 text-right"></div>
                 <div className="w-1/6 text-right"></div>
               </div>
-            </>
+            </div>
           );
         })}
       </div>
