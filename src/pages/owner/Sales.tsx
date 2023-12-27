@@ -3,7 +3,7 @@ import CustomDropdown from '../../component/CustomDropdown';
 import CustomDateRangePicker from './component/CustomDateRangePicker';
 
 function Sales() {
-  let [years, setYears] = useState(['2023년', '2022년', '2021년', '2020년', '2019년']);
+  let years = ['2023년', '2022년', '2021년', '2020년', '2019년'];
   let [tab, setTab] = useState('');
   let halfs = ['상반기', '하반기'];
   let quarters = ['1분기', '2분기', '3분기', '4분기'];
