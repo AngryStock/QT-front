@@ -9,9 +9,9 @@ function LoginModal({ setLoginModalIsOpen, loginModalIsOpen }: LoginModalProps) 
   const toggleModal = () => setLoginModalIsOpen(!loginModalIsOpen);
 
   return (
-    <div className="absolute w-full h-full z-20 flex justify-center items-center">
+    <div className="absolute w-full h-full p-[72px] z-20 flex justify-center items-center">
       <div className="w-full h-full absolute" onClick={toggleModal}></div>
-      <div className="w-1/2 h-1/2 bg-white rounded-lg min-w-80 min-h-[500px] max-w-[512px] z-10 p-6 font-bold relative">
+      <div className="w-1/2 h-1/2 bg-white rounded-lg min-w-80 min-h-[500px] max-w-[512px] z-10 p-4 font-bold relative">
         <div className="w-full text-right">
           <button className="material-symbols-outlined cursor-pointer" onClick={toggleModal}>
             close
