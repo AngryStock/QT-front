@@ -12,7 +12,7 @@ function Sales() {
   return (
     <div className="w-full p-4">
       <div className="w-full flex mb-2">
-        <div className="w-1/3 border border-gray-400 rounded-lg hover:bg-rose-300">
+        <div className="w-1/3 border border-gray-400 rounded-lg">
           <CustomDropdown
             list={years}
             options={['between']}
