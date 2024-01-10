@@ -10,7 +10,7 @@ function Main() {
   let [signinModalIsOpen, setSigninModalIsOpen] = useState(false);
 
   return (
-    <div className="h-full w-full relative">
+    <div className="h-full w-full  relative">
       {signinModalIsOpen && (
         <SigninModal signinModalIsOpen={signinModalIsOpen} setSigninModalIsOpen={setSigninModalIsOpen} />
       )}
