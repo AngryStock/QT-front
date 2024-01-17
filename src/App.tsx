@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import Main from './pages/main/Main';
 import Owner from './pages/owner/Owner';
 import Admin from './pages/admin/Admin';
+import Menu from './pages/menu/Menu';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Route path="/" element={<Main />} />
       <Route path="/owner" element={<Owner />} />
       <Route path="/admin" element={<Admin />} />
+      <Route path="/menu" element={<Menu />} />
     </Routes>
   );
 }
