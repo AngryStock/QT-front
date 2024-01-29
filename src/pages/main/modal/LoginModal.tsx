@@ -24,7 +24,7 @@ function LoginModal({ setLoginModalIsOpen, loginModalIsOpen }: LoginModalProps) 
             </div>
 
             <div>
-              <div className="py-2">사업자등록번호</div>
+              <div className="py-2">아이디</div>
               <input type="number" className="w-full h-10 border-2 rounded-lg" aria-label="사업자번호" />
             </div>
 
@@ -32,12 +32,19 @@ function LoginModal({ setLoginModalIsOpen, loginModalIsOpen }: LoginModalProps) 
               <div className="py-2">비밀번호</div>
               <input type="new-password" className="w-full h-10 border-2 rounded-lg" aria-label="비밀번호" />
             </div>
-            <div className="flex items-center justify-center">
-              <input id="default-checkbox" type="checkbox" className="w-4 h-4 accent-rose-500" />
-              <label htmlFor="default-checkbox" className="ms-2">
-                로그인 유지
-              </label>
+            <div className="m-auto">
+              <div className="flex items-center justify-center py-2">
+                <input id="default-checkbox" type="checkbox" className="w-4 h-4 accent-rose-500 cursor-pointer" />
+                <label htmlFor="default-checkbox" className="ms-2 cursor-pointer">
+                  로그인 유지
+                </label>
+              </div>
+              <div className="flex items-center justify-center gap-2 font-normal text-xs w-full">
+                <button>아이디찾기</button>
+                <button>비밀번호찾기</button>
+              </div>
             </div>
+
             <div className="flex justify-center items-center">
               <button
                 type="submit"

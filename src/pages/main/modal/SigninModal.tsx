@@ -12,6 +12,7 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
   const [isClickBusinessNemberCertificatation, setIsClickBusinessNemberCertificatation] = useState(false);
   const [businessNumber, setbusinessNumber] = useState('');
   const [businessNumberCertification, setBusinessNumberCertification] = useState(false);
+  const [ownerId, setOwnerId] = useState('');
   const [password, setPassword] = useState('');
   const [isPassword, setIsPassword] = useState(false);
   const [passwordCheck, setPasswordCheck] = useState('');
@@ -160,6 +161,26 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
             ) : (
               ''
             ))}
+          <div className="mt-2">아이디</div>
+          <div className=" flex justify-center items-center">
+            <input
+              type="text"
+              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
+              placeholder="아이디"
+              maxLength={10}
+              value={ownerId}
+              onChange={(e) => {
+                setOwnerId(e.target.value);
+              }}
+              readOnly={businessNumberCertification}
+            />
+            <button
+              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-300 hover:border-rose-300 hover:text-white"
+              onClick={() => {}}
+            >
+              중복확인
+            </button>
+          </div>
           <div className="mt-2">비밀번호</div>
           <input
             type="password"
