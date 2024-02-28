@@ -21,7 +21,7 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: yangheeil/qt-front-deploy
+          images: yangheeil/qt-front
           tag-semver: |
             {{version}}
             {{major}}.{{minor}}
@@ -54,9 +54,9 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull yangheeil/qt-front-deploy:latest
+            docker pull yangheeil/qt-front:latest
             docker stop web || true
             docker rm web || true
-            docker run -d --name web -p 80:80 yangheeil/qt-front-deploy:latest
+            docker run -d --name web -p 80:80 yangheeil/qt-front:latest
 
-      # 1
+      # 12
