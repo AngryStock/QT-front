@@ -21,12 +21,10 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: yangheeil/qt-front-deploy
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/qt-front-deploy
           tag-semver: |
             {{version}}
             {{major}}.{{minor}}
-          tag-custom: |
-            latest=${{ github.ref == 'refs/heads/main' }}
 
       # 도커 빌드 관련 셋업
       - name: Set up Docker Buildx
@@ -56,9 +54,9 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull yangheeil/qt-front-deploy:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/qt-front-deploy:latest
             docker stop web || true
             docker rm web || true
-            docker run -d --name web -p 80:80 yangheeil/qt-front-deploy:latest
+            docker run -d --name web -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/qt-front-deploy:latest
 
       # 1234
