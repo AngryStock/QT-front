@@ -40,8 +40,21 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./Dockerfile.prod
+          file: ./Dockerfile
           platforms: linux/amd64
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
+
+      # 도커이미지 EC2 에서 pull 그리고 컨테이너 실행
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          sername: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker pull yangheeil/qt-front-deploy:latest
+            docker stop web || true
+            docker rm web || true
+            docker run -d --name web -p 80:80 yangheeil/qt-front-deploy:latest

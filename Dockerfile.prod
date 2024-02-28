@@ -1,5 +1,0 @@
-FROM node:19
-COPY package.json .
-RUN npm i
-COPY ./ ./
-CMD ["npm","run","build"]
