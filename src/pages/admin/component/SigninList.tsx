@@ -1,6 +1,6 @@
 function SigninList() {
-  let date = new Date();
-  let today = `${String(date.getFullYear()).slice(-2)}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+  const date = new Date();
+  const today = `${String(date.getFullYear()).slice(-2)}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
   return (
     <div>
       <div className="flex w-full text-lg py-2 items-center">
@@ -10,7 +10,7 @@ function SigninList() {
         <div className=" w-32 text-center">승인여부</div>
       </div>
       <div className="w-full border border-black"></div>
-      {[1, 2, 3].map((a) => {
+      {[1, 2, 3].map(() => {
         return (
           <div>
             <div className="flex w-full items-center py-2">
