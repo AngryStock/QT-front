@@ -58,3 +58,5 @@ jobs:
             docker stop web || true
             docker rm web || true
             docker run -d --name web -p 80:80 yangheeil/qt-front-deploy:latest
+
+      # 1
