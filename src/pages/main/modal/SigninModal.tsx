@@ -1,7 +1,7 @@
 import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
 
 import axios from 'axios';
-import { useDaumPostcodePopup } from 'react-daum-postcode';
+import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 
 interface SigninModalProps {
   signinModalIsOpen: boolean;
@@ -43,6 +43,7 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
 
   const businessRegistrationChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+      console.log(e.target.files);
       setBusinessRegistrationFile(e.target.files[0]);
       setBusinessRegistrationFileName(e.target.files[0].name);
     }
@@ -50,12 +51,13 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
 
   const businessReportCertificateChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+      console.log(e.target.files);
       setBusinessNumberCertificateFile(e.target.files[0]);
       setBusinessNumberCertificateFileName(e.target.files[0].name);
     }
   };
   const open = useDaumPostcodePopup('https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js');
-  const handleComplete = (data: any) => {
+  const handleComplete = (data: Address) => {
     let fullAddress = data.address;
     let extraAddress = '';
 
@@ -277,7 +279,7 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
             onChange={(e) => setDetailedAddress(e.target.value)}
           />
           <div className="font-bold mt-2 w-full flex justify-center items-center">
-            <div className="w-1/2 pr-4">
+            <div className="w-2/5 pr-4">
               <div>은행</div>
               <input
                 type="text"
@@ -287,7 +289,7 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
                 onChange={(e) => setBank(e.target.value)}
               />
             </div>
-            <div className="w-1/2">
+            <div className="w-3/5">
               <div>계좌번호</div>
               <input
                 type="number"
