@@ -12,7 +12,7 @@ function Main() {
   const [modal, setModal] = useState({
     loginModalIsOpen: false,
     signinModalIsOpen: false,
-    submittedModalIsOpen: true,
+    submittedModalIsOpen: false,
   });
   const modalHandler = (name: string, value: boolean) => {
     setModal((prevState) => ({
