@@ -1,12 +1,11 @@
-import { Dispatch, SetStateAction } from 'react';
+type ModalHandler = (name: string, value: boolean) => void;
 
 interface LoginModalProps {
-  setLoginModalIsOpen: Dispatch<SetStateAction<boolean>>;
-  loginModalIsOpen: boolean;
+  modalHandler: ModalHandler;
 }
 
-function LoginModal({ setLoginModalIsOpen, loginModalIsOpen }: LoginModalProps) {
-  const toggleModal = () => setLoginModalIsOpen(!loginModalIsOpen);
+function LoginModal({ modalHandler }: LoginModalProps) {
+  const toggleModal = () => modalHandler('loginModalIsOpen', false);
 
   return (
     <div className="absolute w-full h-full p-[72px] z-20 flex justify-center items-center">
@@ -25,7 +24,7 @@ function LoginModal({ setLoginModalIsOpen, loginModalIsOpen }: LoginModalProps) 
 
             <div>
               <div className="py-2">아이디</div>
-              <input type="number" className="w-full h-10 border-2 rounded-lg" aria-label="사업자번호" />
+              <input type="text" className="w-full h-10 border-2 rounded-lg" aria-label="아이디" />
             </div>
 
             <div>

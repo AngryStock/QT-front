@@ -1,77 +1,156 @@
-import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
 
 import axios from 'axios';
 import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { signup } from '@/store/reducers/ownersApprovalSlice';
+import { Owner } from '@/store/reducers/ownersSlice';
+import { signupApi } from '@/util/api-util';
+import { regenerateAddress } from '@/util/stringHelpers';
+
+type ModalHandler = (name: string, value: boolean) => void;
+
 interface SigninModalProps {
-  signinModalIsOpen: boolean;
-  setSigninModalIsOpen: Dispatch<SetStateAction<boolean>>;
+  modalHandler: ModalHandler;
 }
 
-function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalProps) {
-  const [isInputBusinessNumber, setIsInputBusinessNumber] = useState(false);
-  const [isClickBusinessNemberCertificatation, setIsClickBusinessNemberCertificatation] = useState(false);
-  const [businessNumber, setbusinessNumber] = useState('');
-  const [businessNumberCertification, setBusinessNumberCertification] = useState(false);
-  const [ownerId, setOwnerId] = useState('');
-  const [password, setPassword] = useState('');
-  const [isPassword, setIsPassword] = useState(false);
-  const [passwordCheck, setPasswordCheck] = useState('');
-  const [isPasswordCheck, setIsPasswordCheck] = useState(false);
-  const [businessName, setBusinessName] = useState('');
-  const [representativeName, setRepresentativeName] = useState('');
-  const [representativeCellPhoneNumber, setRepresentativeCellPhoneNumber] = useState('');
-  const [storePhoneNumber, setStorePhoneNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [address, setAddress] = useState('');
-  const [detailedAddress, setDetailedAddress] = useState('');
-  const [bank, setBank] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
-  const [businessNumberCertificateFileName, setBusinessNumberCertificateFileName] = useState('');
-  const [businessNumberCertificateFile, setBusinessNumberCertificateFile] = useState<File | null>(null);
-  const [businessRegistrationFileName, setBusinessRegistrationFileName] = useState('');
-  const [businessRegistrationFile, setBusinessRegistrationFile] = useState<File | null>(null);
-  const [copyOfBankbookFileName, setCopyOfBankbookFileName] = useState('');
-  const [copyOfbankbookfile, setCopyOfBankbookFile] = useState<File | null>(null);
+export interface Files {
+  businessReportCertificateFileName: string;
+  businessRegistrationFileName: string;
+  copyOfBankbookFileName: string;
+  businessReportCertificateFile: File | null;
+  businessRegistrationFile: File | null;
+  copyOfBankbookFile: File | null;
+}
 
-  const copyOfBankbookChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setCopyOfBankbookFile(e.target.files[0]);
-      setCopyOfBankbookFileName(e.target.files[0].name);
+export interface IsUserInform {
+  isInputBusinessNumber: boolean;
+  isClickBusinessNemberCertificatation: boolean;
+  businessNumberCertification: boolean;
+  isPassword: boolean;
+  isPasswordCheck: boolean;
+  isOwnerId: string;
+}
+
+function SigninModal({ modalHandler }: SigninModalProps) {
+  const dispatch = useAppDispatch();
+
+  const [files, setFiles] = useState<Files>({
+    businessReportCertificateFileName: '',
+    businessRegistrationFileName: '',
+    copyOfBankbookFileName: '',
+    businessReportCertificateFile: null,
+    businessRegistrationFile: null,
+    copyOfBankbookFile: null,
+  });
+
+  const [isUserInform, setIsUserInform] = useState({
+    isInputBusinessNumber: false,
+    isClickBusinessNemberCertificatation: false,
+    businessNumberCertification: false,
+    isPassword: false,
+    isPasswordCheck: false,
+    isOwnerId: 'disavailable',
+  });
+
+  const [userInform, setUserInform] = useState({
+    businessNumber: '',
+    ownerId: '',
+    password: '',
+    passwordCheck: '',
+    businessName: '',
+    representativeName: '',
+    representativeCellPhoneNumber: '',
+    storePhoneNumber: '',
+    email: '',
+    address: '',
+    detailedAddress: '',
+    bank: '',
+    accountNumber: '',
+  });
+
+  const toggleModal = () => modalHandler('signinModalIsOpen', false);
+
+  const signupApiHnadler = async () => {
+    const res = await signupApi(userInform, isUserInform, files);
+    if (res.status === 404) {
+      alert('모든 양식을 입력해주세요');
+      return;
+    }
+
+    dispatch(
+      signup({
+        businessNumber: userInform.businessNumber,
+        ownerId: userInform.ownerId,
+        password: userInform.password,
+        passwordCheck: userInform.passwordCheck,
+        businessName: userInform.businessName,
+        representativeName: userInform.representativeName,
+        representativeCellPhoneNumber: userInform.representativeCellPhoneNumber,
+        storePhoneNumber: userInform.storePhoneNumber,
+        email: userInform.email,
+        address: userInform.address,
+        detailedAddress: userInform.detailedAddress,
+        bank: userInform.bank,
+        accountNumber: userInform.accountNumber,
+        businessReportCertificateFileName: files.businessReportCertificateFileName,
+        businessRegistrationFileName: files.businessRegistrationFileName,
+        copyOfBankbookFileName: files.copyOfBankbookFileName,
+        businessReportCertificateFileUrl: res.businessReportCertificateFileUrl,
+        businessRegistrationFileUrl: res.businessRegistrationFileUrl,
+        copyOfBankbookFileUrl: res.copyOfBankbookFileUrl,
+        date: res.date,
+      }),
+    );
+    toggleModal();
+    modalHandler('submittedModalIsOpen', true);
+  };
+
+  const owners1 = useAppSelector((state) => state.owners);
+  const owners2 = useAppSelector((state) => state.ownersApproval);
+
+  const isOwnerIdAvailable = () => {
+    const ownerIds1 = owners1.map((owner: Owner) => owner.ownerId);
+    const ownerIds2 = owners2.map((owner: Owner) => owner.ownerId);
+    if (ownerIds1.includes(userInform.ownerId) || ownerIds2.includes(userInform.ownerId)) {
+      userIsInformChangeHandler(['isOwnerId'], ['already']);
+    } else {
+      userIsInformChangeHandler(['isOwnerId'], ['available']);
     }
   };
 
-  const businessRegistrationChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      console.log(e.target.files);
-      setBusinessRegistrationFile(e.target.files[0]);
-      setBusinessRegistrationFileName(e.target.files[0].name);
-    }
+  const fileChangeHandler = (files: { name: string; value: File | string }[]) => {
+    console.log(files);
+    files.map(({ name, value }) => {
+      setFiles((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    });
+  };
+  const userIsInformChangeHandler = (names: string[], values: boolean[] | string[]) => {
+    names.map((name, i) => {
+      setIsUserInform((prevState) => ({
+        ...prevState,
+        [name]: values[i],
+      }));
+    });
   };
 
-  const businessReportCertificateChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      console.log(e.target.files);
-      setBusinessNumberCertificateFile(e.target.files[0]);
-      setBusinessNumberCertificateFileName(e.target.files[0].name);
-    }
+  const userInformChangeHandler = (names: string[], values: string[]) => {
+    names.map((name, i) => {
+      setUserInform((prevState) => ({
+        ...prevState,
+        [name]: values[i],
+      }));
+    });
   };
+
   const open = useDaumPostcodePopup('https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js');
-  const handleComplete = (data: Address) => {
-    let fullAddress = data.address;
-    let extraAddress = '';
-
-    if (data.addressType === 'R') {
-      if (data.bname !== '') {
-        extraAddress += data.bname;
-      }
-      if (data.buildingName !== '') {
-        extraAddress += extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
-      }
-      fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
-    }
-    console.log(fullAddress);
-    setAddress(fullAddress);
+  const handleComplete = async (data: Address) => {
+    const res = regenerateAddress(data);
+    userInformChangeHandler(['address'], [res]);
   };
 
   const handleClick = () => {
@@ -79,30 +158,29 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
   };
 
   const handlePassword = (value: string) => {
-    if (passwordCheck === value || password === value) {
-      setIsPasswordCheck(true);
+    if (userInform.passwordCheck === value || userInform.password === value) {
+      userIsInformChangeHandler(['isPasswordCheck'], [true]);
     } else {
-      setIsPasswordCheck(false);
+      userIsInformChangeHandler(['isPasswordCheck'], [false]);
     }
   };
   const passwordHandler = (value: string) => {
     const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
-    setPassword(value);
-    setIsPassword(regex.test(value));
+    userInformChangeHandler(['password'], [value]);
+    userIsInformChangeHandler(['isPassword'], [regex.test(value)]);
     handlePassword(value);
   };
   const passwordCheckHandler = (value: string) => {
-    setPasswordCheck(value);
+    userInformChangeHandler(['passwordCheck'], [value]);
     handlePassword(value);
   };
-  const toggleModal = () => setSigninModalIsOpen(!signinModalIsOpen);
   const businessnumberCertifactionHandler = async () => {
     const res = await axios.post(
       'https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=8MJVXZ2lsT1rIlmXy46ALToKu1C%2Fh6wE4OTpvs1x42lWE03elodgLCCSYY%2B%2Fr61YAPhrF%2FmyPMqvEiaVlBwC%2FA%3D%3D',
-      { b_no: [businessNumber] },
+      { b_no: [userInform.businessNumber] },
     );
     if (res.data.data[0].b_stt_cd === '01') {
-      setBusinessNumberCertification(true);
+      userIsInformChangeHandler(['businessNumberCertification'], [true]);
     }
   };
 
@@ -124,42 +202,48 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
               className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
               placeholder="사업자등록번호"
               maxLength={10}
-              value={businessNumber}
+              value={userInform.businessNumber}
               onChange={(e) => {
-                if (!isInputBusinessNumber) setIsInputBusinessNumber(true);
-                if (isClickBusinessNemberCertificatation) setIsClickBusinessNemberCertificatation(false);
-                setbusinessNumber(e.target.value);
+                if (!isUserInform.isInputBusinessNumber) userIsInformChangeHandler(['isInputBusinessNumber'], [true]);
+                if (isUserInform.isClickBusinessNemberCertificatation) {
+                  userIsInformChangeHandler(['isClickBusinessNemberCertificatation'], [false]);
+                }
+                userInformChangeHandler(['businessNumber'], [e.target.value]);
               }}
-              readOnly={businessNumberCertification}
+              readOnly={isUserInform.businessNumberCertification}
             />
             <button
               className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-300 hover:border-rose-300 hover:text-white"
-              onClick={() => {
-                if (businessNumberCertification) {
-                  setIsInputBusinessNumber(false);
-                  setIsClickBusinessNemberCertificatation(false);
-                  setbusinessNumber('');
-                  setBusinessNumberCertification(false);
+              onClick={(e) => {
+                e.preventDefault();
+                if (isUserInform.businessNumberCertification) {
+                  userInformChangeHandler(['businessNumber'], ['']);
+                  userIsInformChangeHandler(
+                    ['isInputBusinessNumber', 'isClickBusinessNemberCertificatation', 'businessNumberCertification'],
+                    [false, false, false],
+                  );
                 } else {
-                  setIsClickBusinessNemberCertificatation(true);
-                  setIsInputBusinessNumber(false);
+                  userIsInformChangeHandler(
+                    ['isClickBusinessNemberCertificatation', 'isInputBusinessNumber'],
+                    [true, false],
+                  );
                   businessnumberCertifactionHandler();
                 }
               }}
             >
-              {businessNumberCertification ? '초기화' : '인증'}
+              {isUserInform.businessNumberCertification ? '초기화' : '인증'}
             </button>
           </div>
-          {isClickBusinessNemberCertificatation &&
-            (businessNumberCertification ? (
+          {isUserInform.isClickBusinessNemberCertificatation &&
+            (isUserInform.businessNumberCertification ? (
               <div className=" text-xs text-blue-500 mt-1">사업자등록번호 인증이 완료되었습니다.</div>
             ) : (
               <div className="text-xs text-red-500 mt-1">유효하지 않은 사업자등록번호입니다.</div>
             ))}
-          {isInputBusinessNumber &&
-            (businessNumber.length > 0 && businessNumber.length < 10 ? (
+          {isUserInform.isInputBusinessNumber &&
+            (userInform.businessNumber.length > 0 && userInform.businessNumber.length < 10 ? (
               <div className="text-xs text-red-500 mt-1">형식에 맞게 입력해주세요.</div>
-            ) : businessNumber.length === 0 ? (
+            ) : userInform.businessNumber.length === 0 ? (
               <div className="text-xs text-red-500 mt-1">필수 입력사항입니다.</div>
             ) : (
               ''
@@ -171,19 +255,31 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
               className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
               placeholder="아이디"
               maxLength={10}
-              value={ownerId}
+              value={userInform.ownerId}
               onChange={(e) => {
-                setOwnerId(e.target.value);
+                userIsInformChangeHandler(['isOwnerId'], ['disavailable']);
+                userInformChangeHandler(['ownerId'], [e.target.value]);
               }}
-              readOnly={businessNumberCertification}
             />
             <button
               className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-300 hover:border-rose-300 hover:text-white"
-              onClick={() => {}}
+              onClick={(e) => {
+                e.preventDefault();
+                isOwnerIdAvailable();
+              }}
             >
               중복확인
             </button>
           </div>
+          {isUserInform.isOwnerId === 'available' && (
+            <div className="text-xs text-blue-500 mt-1">사용 가능한 아이디 입니다.</div>
+          )}
+          {isUserInform.isOwnerId === 'already' && (
+            <div className="text-xs text-red-500 mt-1">이미 사용중인 아이디 입니다.</div>
+          )}
+          {isUserInform.isOwnerId === 'disavailable' && userInform.ownerId.length > 0 && (
+            <div className="text-xs text-red-500 mt-1">중복확인을 해주세요.</div>
+          )}
           <div className="mt-2">비밀번호</div>
           <input
             type="password"
@@ -191,10 +287,10 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
             placeholder="비밀번호"
             maxLength={16}
             autoComplete="false"
-            value={password}
+            value={userInform.password}
             onChange={(e) => passwordHandler(e.target.value)}
           />
-          {!isPassword && password.length > 0 && (
+          {!isUserInform.isPassword && userInform.password.length > 0 && (
             <div className="text-xs text-red-500 mt-1">
               비밀번호는 8자 이상, 16자 이하의 영문, 숫자 및 특수문자를 조합하여 사용해야 합니다.
             </div>
@@ -206,10 +302,10 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
             maxLength={16}
             autoComplete="false"
             placeholder="비밀번호 확인"
-            value={passwordCheck}
+            value={userInform.passwordCheck}
             onChange={(e) => passwordCheckHandler(e.target.value)}
           />
-          {!isPasswordCheck && passwordCheck.length > 0 && (
+          {!isUserInform.isPasswordCheck && userInform.passwordCheck.length > 0 && (
             <div className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다.</div>
           )}
 
@@ -218,40 +314,40 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
             type="text"
             className="w-full border-2 rounded-lg h-10 px-2"
             placeholder="상호명"
-            value={businessName}
-            onChange={(e) => setBusinessName(e.target.value)}
+            value={userInform.businessName}
+            onChange={(e) => userInformChangeHandler(['businessName'], [e.target.value])}
           />
           <div className=" font-bold mt-2">대표자명</div>
           <input
             type="text"
             className="w-full border-2 rounded-lg h-10 px-2"
             placeholder="대표자명"
-            value={representativeName}
-            onChange={(e) => setRepresentativeName(e.target.value)}
+            value={userInform.representativeName}
+            onChange={(e) => userInformChangeHandler(['representativeName'], [e.target.value])}
           />
           <div className=" font-bold mt-2">대표자 휴대폰번호</div>
           <input
             type="number"
             className="w-full border-2 rounded-lg h-10 px-2"
             placeholder="대표자 휴대폰번호"
-            value={representativeCellPhoneNumber}
-            onChange={(e) => setRepresentativeCellPhoneNumber(e.target.value)}
+            value={userInform.representativeCellPhoneNumber}
+            onChange={(e) => userInformChangeHandler(['representativeCellPhoneNumber'], [e.target.value])}
           />
           <div className=" font-bold mt-2">업체 전화번호</div>
           <input
             type="number"
             className="w-full border-2 rounded-lg h-10 px-2"
             placeholder="업체 전화번호"
-            value={storePhoneNumber}
-            onChange={(e) => setStorePhoneNumber(e.target.value)}
+            value={userInform.storePhoneNumber}
+            onChange={(e) => userInformChangeHandler(['storePhoneNumber'], [e.target.value])}
           />
           <div className=" font-bold mt-2">이메일</div>
           <input
             type="email"
             className="w-full border-2 rounded-lg h-10 px-2"
             placeholder="이메일"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={userInform.email}
+            onChange={(e) => userInformChangeHandler(['email'], [e.target.value])}
           />
           <div className=" font-bold mt-2">주소</div>
           <div className=" flex justify-center items-center ">
@@ -260,7 +356,7 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
               className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
               readOnly
               placeholder="주소검색 버튼을 누르세요"
-              value={address}
+              value={userInform.address}
             />
             <button
               type="button"
@@ -275,8 +371,8 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
             type="text"
             className="w-full border-2 rounded-lg h-10 px-2"
             placeholder="상세주소"
-            value={detailedAddress}
-            onChange={(e) => setDetailedAddress(e.target.value)}
+            value={userInform.detailedAddress}
+            onChange={(e) => userInformChangeHandler(['detailedAddress'], [e.target.value])}
           />
           <div className="font-bold mt-2 w-full flex justify-center items-center">
             <div className="w-2/5 pr-4">
@@ -285,8 +381,8 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
                 type="text"
                 className="w-full border-2 rounded-lg h-10 px-2"
                 placeholder="은행"
-                value={bank}
-                onChange={(e) => setBank(e.target.value)}
+                value={userInform.bank}
+                onChange={(e) => userInformChangeHandler(['bank'], [e.target.value])}
               />
             </div>
             <div className="w-3/5">
@@ -294,8 +390,8 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
               <input
                 type="number"
                 className="w-full border-2 rounded-lg h-10 mr-2 px-2"
-                value={accountNumber}
-                onChange={(e) => setAccountNumber(e.target.value)}
+                value={userInform.accountNumber}
+                onChange={(e) => userInformChangeHandler(['accountNumber'], [e.target.value])}
                 placeholder="계좌번호"
               />
             </div>
@@ -307,13 +403,21 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
               className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
               readOnly
               placeholder="파일을 선택해주세요"
-              value={businessRegistrationFileName}
+              value={files.businessRegistrationFileName}
             />
             <input
               type="file"
+              accept=".pdf, .jpg, .png, image/*"
               className=" hidden"
               placeholder="파일을 선택해주세요"
-              onChange={businessRegistrationChangeHandler}
+              onChange={(e) => {
+                if (e.target.files) {
+                  fileChangeHandler([
+                    { name: 'businessRegistrationFileName', value: e.target.files[0].name },
+                    { name: 'businessRegistrationFile', value: e.target.files[0] },
+                  ]);
+                }
+              }}
               id="businessRegistrationFile"
             />
             <label
@@ -330,13 +434,21 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
               className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
               readOnly
               placeholder="파일을 선택해주세요"
-              value={businessNumberCertificateFileName}
+              value={files.businessReportCertificateFileName}
             />
             <input
               type="file"
+              accept=".pdf, .jpg, .png, image/*"
               className=" hidden"
               placeholder="파일을 선택해주세요"
-              onChange={businessReportCertificateChangeHandler}
+              onChange={(e) => {
+                if (e.target.files) {
+                  fileChangeHandler([
+                    { name: 'businessReportCertificateFileName', value: e.target.files[0].name },
+                    { name: 'businessReportCertificateFile', value: e.target.files[0] },
+                  ]);
+                }
+              }}
               id="businessReportCertificateFile"
             />
             <label
@@ -350,16 +462,24 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
           <div className=" flex justify-center items-center ">
             <input
               type="text"
+              accept=".pdf, .jpg, .png, image/*"
               className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
               readOnly
               placeholder="파일을 선택해주세요"
-              value={copyOfBankbookFileName}
+              value={files.copyOfBankbookFileName}
             />
             <input
               type="file"
               className=" hidden"
               placeholder="파일을 선택해주세요"
-              onChange={copyOfBankbookChangeHandler}
+              onChange={(e) => {
+                if (e.target.files) {
+                  fileChangeHandler([
+                    { name: 'copyOfBankbookFileName', value: e.target.files[0].name },
+                    { name: 'copyOfBankbookFile', value: e.target.files[0] },
+                  ]);
+                }
+              }}
               id="copyOfBankbookFile"
             />
             <label
@@ -373,6 +493,10 @@ function SigninModal({ setSigninModalIsOpen, signinModalIsOpen }: SigninModalPro
             <button
               type="submit"
               className="w-full bg-rose-500 rounded-lg h-10 flex justify-center items-center text-white"
+              onClick={(e) => {
+                e.preventDefault();
+                signupApiHnadler();
+              }}
             >
               등록하기
             </button>

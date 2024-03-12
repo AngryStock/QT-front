@@ -11,10 +11,11 @@ jobs:
         uses: actions/checkout@v2
 
       # 도커 이미지에 env 파일 포함
-      # - name: Create .env file
-      #   run: |
-      #     touch .env
-      # echo REACT_APP_KAKAO_REST_API_KEY=\ >> .env
+      - name: Create .env file
+        run: |
+          echo "VITE_EMAILJS_SERVICE_ID=${{ secrets.VITE_EMAILJS_SERVICE_ID }}" >> .env
+          echo "VITE_EMAILJS_TEMPLATE_ID=${{ secrets.VITE_EMAILJS_TEMPLATE_ID }}" >> .env
+          echo "VITE_EMAILJS_PUBLIC_KEY=${{ secrets.VITE_EMAILJS_PUBLIC_KEY }}" >> .env
 
       # 도커 메타
       - name: Docker meta

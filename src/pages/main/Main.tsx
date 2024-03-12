@@ -5,18 +5,26 @@ import CustomDropdown from '@/component/CustomDropdown';
 import styles from './Main.module.css';
 import LoginModal from './modal/LoginModal';
 import SigninModal from './modal/SigninModal';
+import SubmittedModal from './modal/SubmittedModal';
 
 function Main() {
   const language = ['KR', 'EN', 'JP'];
-  const [loginModalIsOpen, setLoginModalIsOpen] = useState(false);
-  const [signinModalIsOpen, setSigninModalIsOpen] = useState(false);
-
+  const [modal, setModal] = useState({
+    loginModalIsOpen: false,
+    signinModalIsOpen: false,
+    submittedModalIsOpen: true,
+  });
+  const modalHandler = (name: string, value: boolean) => {
+    setModal((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
   return (
     <div className="h-full w-full  relative">
-      {signinModalIsOpen && (
-        <SigninModal signinModalIsOpen={signinModalIsOpen} setSigninModalIsOpen={setSigninModalIsOpen} />
-      )}
-      {loginModalIsOpen && <LoginModal setLoginModalIsOpen={setLoginModalIsOpen} loginModalIsOpen={loginModalIsOpen} />}
+      {modal.signinModalIsOpen && <SigninModal modalHandler={modalHandler} />}
+      {modal.loginModalIsOpen && <LoginModal modalHandler={modalHandler} />}
+      {modal.submittedModalIsOpen && <SubmittedModal modalHandler={modalHandler} />}
       <div className="h-full relative z-10">
         <div className={`h-full ${styles.mainBackground} absolute top-0 right-0 bottom-0 left-0 -z-10`}></div>
         <header className="w-full flex items-center p-4 font-bold whitespace-nowrap justify-between">
@@ -28,7 +36,7 @@ function Main() {
             <div
               className="w-1/4 text-white p-2 rounded-lg cursor-pointer hover:text-rose-300"
               onClick={() => {
-                setSigninModalIsOpen(!signinModalIsOpen);
+                modalHandler('signinModalIsOpen', true);
               }}
             >
               업체등록
@@ -36,7 +44,7 @@ function Main() {
             <div
               className="w-1/4 text-white p-2 rounded-lg cursor-pointer hover:text-rose-300"
               onClick={() => {
-                setLoginModalIsOpen(!loginModalIsOpen);
+                modalHandler('loginModalIsOpen', true);
               }}
             >
               로그인

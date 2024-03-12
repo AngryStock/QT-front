@@ -5,6 +5,8 @@ import storage from 'redux-persist/lib/storage';
 import categorysSliceReducer from './reducers/categorysSlice';
 import menusSliceReducer from './reducers/menusSlice';
 import optionsSliceReducer from './reducers/optionsSlice';
+import ownersApprovalSliceReducer from './reducers/ownersApprovalSlice';
+import ownersSliceReducer from './reducers/ownersSlice';
 import topExposureMenusSliceReducer from './reducers/topExposureMenusSlice';
 import topExposureSliceReducer from './reducers/topExposureSlice';
 
@@ -14,12 +16,14 @@ const reducer = combineReducers({
   topExposure: topExposureSliceReducer,
   topExposureMenus: topExposureMenusSliceReducer,
   options: optionsSliceReducer,
+  owners: ownersSliceReducer,
+  ownersApproval: ownersApprovalSliceReducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: [],
+  whitelist: ['owners', 'ownersApproval'],
 };
 
 export const store = configureStore({
