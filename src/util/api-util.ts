@@ -59,7 +59,7 @@ export const signupApi = async (userInform: Owner, isUserInform: IsUserInform, f
   formData.append('businessNumberCertificateFile', businessReportCertificateFile);
   formData.append('businessRegistrationFile', businessRegistrationFile);
   formData.append('copyOfBankbookFile', copyOfBankbookFile);
-  const res = await axios.post('/api/signup', formData, {
+  const res = await axios.post('http://localhost:3000/signup', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -70,7 +70,7 @@ export const signupApi = async (userInform: Owner, isUserInform: IsUserInform, f
 export const documentDownloadApi = async (url: string) => {
   try {
     const response = await axios({
-      url: `/api/image/${url}`, // 파일 URL
+      url: `http://localhost:3000/image/${url}`, // 파일 URL
       method: 'GET',
       responseType: 'blob', // 서버로부터 받은 데이터가 Blob 형태임을 명시
     });
