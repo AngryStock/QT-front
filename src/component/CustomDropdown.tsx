@@ -42,8 +42,8 @@ function CustomDropdown({ list, options, height, selectTextColor, hoverSelctText
                 className={`${list.length !== index + 1 ? 'border-b border-gray-400' : 'rounded-b-lg'} ${
                   index === 0 && 'rounded-t-lg'
                 } ${options.includes('center') ? 'justify-center' : 'px-2'} ${
-                  selectList === option ? 'bg-rose-300' : 'none'
-                } h-${height}  cursor-pointer w-full hover:bg-rose-300 hover:font-bold flex items-center`}
+                  selectList === option ? 'bg-rose-500 text-white' : 'none'
+                } h-${height}  cursor-pointer w-full hover:bg-rose-500 hover:text-white flex items-center`}
               >
                 <div className="w-full flex justify-between">
                   <div>{option}</div>

@@ -1,3 +1,9 @@
+import { useState } from 'react';
+
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { login } from '@/store/reducers/loginStateSlice';
+import { Owner } from '@/store/reducers/ownersSlice';
+
 type ModalHandler = (name: string, value: boolean) => void;
 
 interface LoginModalProps {
@@ -5,7 +11,32 @@ interface LoginModalProps {
 }
 
 function LoginModal({ modalHandler }: LoginModalProps) {
+  const dispatch = useAppDispatch();
   const toggleModal = () => modalHandler('loginModalIsOpen', false);
+
+  const [ownerId, setOwnerId] = useState('');
+  const [password, setPassword] = useState('');
+  const [keepLogin, setKeepLogin] = useState(true);
+
+  const owners: Owner[] = useAppSelector((state) => state.owners);
+
+  const loginApiHandler = async () => {
+    const target = owners.find((owner) => owner.ownerId === ownerId);
+    if (target === undefined) {
+      alert('없는 아이디 입니다');
+      setOwnerId('');
+      setPassword('');
+      return;
+    } else if (target.password !== password) {
+      alert('잘못된 비밀번호 입니다.');
+      setPassword('');
+
+      return;
+    } else if (target.password === password) {
+      dispatch(login(target));
+      toggleModal();
+    }
+  };
 
   return (
     <div className="absolute w-full h-full p-[72px] z-20 flex justify-center items-center">
@@ -16,7 +47,12 @@ function LoginModal({ modalHandler }: LoginModalProps) {
             close
           </button>
         </div>
-        <form>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            loginApiHandler();
+          }}
+        >
           <div className="grid grid-rows-5">
             <div className="flex justify-center items-center">
               <div className="text-lg">오너 로그인</div>
@@ -24,16 +60,39 @@ function LoginModal({ modalHandler }: LoginModalProps) {
 
             <div>
               <div className="py-2">아이디</div>
-              <input type="text" className="w-full h-10 border-2 rounded-lg" aria-label="아이디" />
+              <input
+                type="text"
+                className="w-full h-10 border-2 rounded-lg outline-none focus:border-rose-500"
+                aria-label="아이디"
+                value={ownerId}
+                onChange={(e) => {
+                  setOwnerId(e.target.value);
+                }}
+              />
             </div>
 
             <div>
               <div className="py-2">비밀번호</div>
-              <input type="new-password" className="w-full h-10 border-2 rounded-lg" aria-label="비밀번호" />
+              <input
+                type="password"
+                className="w-full h-10 border-2 rounded-lg outline-none focus:border-rose-500"
+                aria-label="비밀번호"
+                value={password}
+                autoComplete="false"
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
+              />
             </div>
             <div className="m-auto">
               <div className="flex items-center justify-center py-2">
-                <input id="default-checkbox" type="checkbox" className="w-4 h-4 accent-rose-500 cursor-pointer" />
+                <input
+                  id="default-checkbox"
+                  type="checkbox"
+                  className="w-4 h-4 accent-rose-500 cursor-pointer"
+                  checked={keepLogin}
+                  onChange={(e) => setKeepLogin(e.target.checked)}
+                />
                 <label htmlFor="default-checkbox" className="ms-2 cursor-pointer">
                   로그인 유지
                 </label>

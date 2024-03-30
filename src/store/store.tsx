@@ -3,6 +3,7 @@ import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 import categorysSliceReducer from './reducers/categorysSlice';
+import loginStateSliceReducer from './reducers/loginStateSlice';
 import menusSliceReducer from './reducers/menusSlice';
 import optionsSliceReducer from './reducers/optionsSlice';
 import ownersApprovalSliceReducer from './reducers/ownersApprovalSlice';
@@ -18,12 +19,13 @@ const reducer = combineReducers({
   options: optionsSliceReducer,
   owners: ownersSliceReducer,
   ownersApproval: ownersApprovalSliceReducer,
+  loginState: loginStateSliceReducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['owners', 'ownersApproval'],
+  whitelist: ['owners', 'ownersApproval', 'loginState', 'categorys', 'menus'],
 };
 
 export const store = configureStore({

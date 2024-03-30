@@ -1,6 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import { useNavigate } from 'react-router-dom';
 
 import CustomDropdown from '@/component/CustomDropdown';
+import { useAppSelector } from '@/store/hooks';
+import { Owner } from '@/store/reducers/ownersSlice';
 
 import styles from './Main.module.css';
 import LoginModal from './modal/LoginModal';
@@ -8,6 +12,8 @@ import SigninModal from './modal/SigninModal';
 import SubmittedModal from './modal/SubmittedModal';
 
 function Main() {
+  const navigate = useNavigate();
+
   const language = ['KR', 'EN', 'JP'];
   const [modal, setModal] = useState({
     loginModalIsOpen: false,
@@ -20,6 +26,14 @@ function Main() {
       [name]: value,
     }));
   };
+
+  const loginState: Owner = useAppSelector((state) => state.loginState);
+  useEffect(() => {
+    if (loginState) {
+      navigate(`/owner/${loginState.id}`);
+    }
+  }, [loginState, navigate]);
+
   return (
     <div className="h-full w-full  relative">
       {modal.signinModalIsOpen && <SigninModal modalHandler={modalHandler} />}

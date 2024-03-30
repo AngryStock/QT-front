@@ -199,7 +199,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className=" flex justify-center items-center">
             <input
               type="text"
-              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
+              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2 outline-none focus:border-rose-500"
               placeholder="사업자등록번호"
               maxLength={10}
               value={userInform.businessNumber}
@@ -213,7 +213,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
               readOnly={isUserInform.businessNumberCertification}
             />
             <button
-              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-300 hover:border-rose-300 hover:text-white"
+              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-500 hover:border-rose-500 hover:text-white"
               onClick={(e) => {
                 e.preventDefault();
                 if (isUserInform.businessNumberCertification) {
@@ -252,7 +252,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className=" flex justify-center items-center">
             <input
               type="text"
-              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
+              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2 outline-none focus:border-rose-500"
               placeholder="아이디"
               maxLength={10}
               value={userInform.ownerId}
@@ -262,7 +262,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
               }}
             />
             <button
-              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-300 hover:border-rose-300 hover:text-white"
+              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-500 hover:border-rose-500 hover:text-white"
               onClick={(e) => {
                 e.preventDefault();
                 isOwnerIdAvailable();
@@ -283,7 +283,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className="mt-2">비밀번호</div>
           <input
             type="password"
-            className="w-full border-2 rounded-lg h-10 px-2"
+            className="w-full border-2 rounded-lg h-10 px-2 outline-none focus:border-rose-500"
             placeholder="비밀번호"
             maxLength={16}
             autoComplete="false"
@@ -298,7 +298,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className="mt-2">비밀번호 확인</div>
           <input
             type="password"
-            className="w-full border-2 rounded-lg h-10 px-2"
+            className="w-full border-2 rounded-lg h-10 px-2 outline-none focus:border-rose-500"
             maxLength={16}
             autoComplete="false"
             placeholder="비밀번호 확인"
@@ -312,7 +312,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className=" font-bold mt-2">상호명</div>
           <input
             type="text"
-            className="w-full border-2 rounded-lg h-10 px-2"
+            className="w-full border-2 rounded-lg h-10 px-2 outline-none focus:border-rose-500"
             placeholder="상호명"
             value={userInform.businessName}
             onChange={(e) => userInformChangeHandler(['businessName'], [e.target.value])}
@@ -320,7 +320,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className=" font-bold mt-2">대표자명</div>
           <input
             type="text"
-            className="w-full border-2 rounded-lg h-10 px-2"
+            className="w-full border-2 rounded-lg h-10 px-2 outline-none  focus:border-rose-500"
             placeholder="대표자명"
             value={userInform.representativeName}
             onChange={(e) => userInformChangeHandler(['representativeName'], [e.target.value])}
@@ -328,7 +328,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className=" font-bold mt-2">대표자 휴대폰번호</div>
           <input
             type="number"
-            className="w-full border-2 rounded-lg h-10 px-2"
+            className="w-full border-2 rounded-lg h-10 px-2 outline-none focus:border-rose-500"
             placeholder="대표자 휴대폰번호"
             value={userInform.representativeCellPhoneNumber}
             onChange={(e) => userInformChangeHandler(['representativeCellPhoneNumber'], [e.target.value])}
@@ -336,7 +336,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className=" font-bold mt-2">업체 전화번호</div>
           <input
             type="number"
-            className="w-full border-2 rounded-lg h-10 px-2"
+            className="w-full border-2 rounded-lg h-10 px-2 outline-none focus:border-rose-500"
             placeholder="업체 전화번호"
             value={userInform.storePhoneNumber}
             onChange={(e) => userInformChangeHandler(['storePhoneNumber'], [e.target.value])}
@@ -344,7 +344,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className=" font-bold mt-2">이메일</div>
           <input
             type="email"
-            className="w-full border-2 rounded-lg h-10 px-2"
+            className="w-full border-2 rounded-lg h-10 px-2 outline-none focus:border-rose-500"
             placeholder="이메일"
             value={userInform.email}
             onChange={(e) => userInformChangeHandler(['email'], [e.target.value])}
@@ -353,14 +353,14 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className=" flex justify-center items-center ">
             <input
               type="text"
-              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
+              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2 outline-none focus:border-rose-500"
               readOnly
               placeholder="주소검색 버튼을 누르세요"
               value={userInform.address}
             />
             <button
               type="button"
-              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-300 hover:border-rose-300 hover:text-white"
+              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-500 hover:border-rose-500 hover:text-white"
               onClick={handleClick}
             >
               주소검색
@@ -369,7 +369,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className=" font-bold mt-2">상세주소</div>
           <input
             type="text"
-            className="w-full border-2 rounded-lg h-10 px-2"
+            className="w-full border-2 rounded-lg h-10 px-2 outline-none focus:border-rose-500"
             placeholder="상세주소"
             value={userInform.detailedAddress}
             onChange={(e) => userInformChangeHandler(['detailedAddress'], [e.target.value])}
@@ -379,7 +379,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
               <div>은행</div>
               <input
                 type="text"
-                className="w-full border-2 rounded-lg h-10 px-2"
+                className="w-full border-2 rounded-lg h-10 px-2 outline-none focus:border-rose-500"
                 placeholder="은행"
                 value={userInform.bank}
                 onChange={(e) => userInformChangeHandler(['bank'], [e.target.value])}
@@ -389,7 +389,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
               <div>계좌번호</div>
               <input
                 type="number"
-                className="w-full border-2 rounded-lg h-10 mr-2 px-2"
+                className="w-full border-2 rounded-lg h-10 mr-2 px-2 outline-none focus:border-rose-500"
                 value={userInform.accountNumber}
                 onChange={(e) => userInformChangeHandler(['accountNumber'], [e.target.value])}
                 placeholder="계좌번호"
@@ -400,7 +400,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className=" flex justify-center items-center ">
             <input
               type="text"
-              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
+              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2 outline-none focus:border-rose-500"
               readOnly
               placeholder="파일을 선택해주세요"
               value={files.businessRegistrationFileName}
@@ -422,7 +422,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
             />
             <label
               htmlFor="businessRegistrationFile"
-              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-300 hover:border-rose-300 hover:text-white flex justify-center items-center cursor-pointer"
+              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-500 hover:border-rose-500 hover:text-white flex justify-center items-center cursor-pointer"
             >
               파일선택
             </label>
@@ -431,7 +431,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
           <div className=" flex justify-center items-center ">
             <input
               type="text"
-              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
+              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2 outline-none focus:border-rose-500"
               readOnly
               placeholder="파일을 선택해주세요"
               value={files.businessReportCertificateFileName}
@@ -453,7 +453,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
             />
             <label
               htmlFor="businessReportCertificateFile"
-              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-300 hover:border-rose-300 hover:text-white flex justify-center items-center cursor-pointer"
+              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-500 hover:border-rose-500 hover:text-white flex justify-center items-center cursor-pointer"
             >
               파일선택
             </label>
@@ -463,7 +463,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
             <input
               type="text"
               accept=".pdf, .jpg, .png, image/*"
-              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2"
+              className="w-4/5 border-2 rounded-lg h-10 mr-2 px-2 outline-none focus:border-rose-500"
               readOnly
               placeholder="파일을 선택해주세요"
               value={files.copyOfBankbookFileName}
@@ -484,7 +484,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
             />
             <label
               htmlFor="copyOfBankbookFile"
-              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-300 hover:border-rose-300 hover:text-white flex justify-center items-center cursor-pointer"
+              className="w-1/5 border-2 rounded-lg h-10 hover:bg-rose-500 hover:border-rose-500 hover:text-white flex justify-center items-center cursor-pointer"
             >
               파일선택
             </label>

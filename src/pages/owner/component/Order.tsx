@@ -4,11 +4,6 @@ export default function Order() {
   const [changeColor1, setChangeColor1] = useState(false);
   const [changeColor2, setChangeColor2] = useState(false);
   const [changeColor3, setChangeColor3] = useState(false);
-  const [List, setList] = useState(false);
-
-  const ListBt = () => {
-    setList(!List);
-  };
 
   const changeColorBt1 = () => {
     setChangeColor1(!changeColor1);
