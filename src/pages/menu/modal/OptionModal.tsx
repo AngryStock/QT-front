@@ -1,41 +1,26 @@
 import { useState } from 'react';
 
-import { useParams } from 'react-router-dom';
+import { ModalHandler } from '@/pages/owner/component/MenuManagement';
+import { Cart, addCart } from '@/store/reducers/cartSlice';
+import { Menus } from '@/store/reducers/menusSlice';
 
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { optionSelectedHandler } from '../../store/reducers/optionsSlice';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { OptionLists, Options, optionSelectedHandler } from '../../../store/reducers/optionsSlice';
 
-interface MenusItem {
-  id: string;
-  category: string;
-  name: string;
-  description: string;
-  price: number;
-  img: string;
-}
-interface Options {
-  id: string;
-  title: string;
-  essential: boolean;
-  only: boolean;
-  optionLists: OptionLists[];
+interface OptionModalPops {
+  menuId: string;
+  modalHandler: ModalHandler;
+  table: string | undefined;
 }
 
-interface OptionLists {
-  id: string;
-  name: string;
-  price: number;
-  isSelected: boolean;
-}
-
-function Option() {
+function OptionModal({ menuId, modalHandler, table }: OptionModalPops) {
   const dispatch = useAppDispatch();
 
-  const { id } = useParams();
-  const menu: MenusItem = useAppSelector((state) => state.topExposureMenus.find((menu: MenusItem) => menu.id === id));
-  const options = useAppSelector((state) => state.options);
+  const menu = useAppSelector((state) => state.menus.find((menu: Menus) => menu.id === menuId));
+  const options = useAppSelector((state) => state.options).filter((option: Options) => option.menuId === menuId);
+  const cart = useAppSelector((state) => state.cart);
   const [amount, setAmount] = useState(1);
-  let totalPrice =
+  const totalPrice =
     options.reduce(
       (totalPrice: number, option: Options) =>
         totalPrice +
@@ -49,12 +34,41 @@ function Option() {
       menu.price,
     ) * amount;
 
+  const selectedOptions = options.flatMap((option: Options) =>
+    option.optionLists.filter((list) => list.isSelected).map((list) => list.name),
+  );
+
+  const totalAmount = cart.reduce((totalAmount: number, cart: Cart) => totalAmount + cart.amount, 0);
+
+  console.log(selectedOptions);
+
   return (
-    <div className="w-full h-full">
+    <div className="absolute w-full h-full z-20 bg-white">
       <header className="w-full flex items-center justify-center h-12 border-b text-center">
-        <div className="w-1/5 material-symbols-outlined">navigate_before</div>
+        <div
+          className="w-1/5 material-symbols-outlined"
+          onClick={() => {
+            modalHandler('optionModalIsOpen', false);
+          }}
+        >
+          navigate_before
+        </div>
         <div className="w-3/5 whitespace-nowrap overflow-hidden">{menu.name}</div>
-        <div className="w-1/5 material-symbols-outlined ">shopping_cart</div>
+        <div className="w-1/5 relative flex justify-center items-center">
+          <div
+            className=" material-symbols-outlined relative"
+            onClick={() => {
+              modalHandler('cartModalIsOpen', true);
+            }}
+          >
+            shopping_cart
+          </div>
+          {totalAmount !== 0 && (
+            <div className="w-5 h-5 bg-rose-500 absolute top-1/2 left-1/2 rounded-full text-sm text-white">
+              {totalAmount}
+            </div>
+          )}
+        </div>
       </header>
       <div className="w-full overflow-y-scroll" style={{ height: `calc(100% - 48px - 68px)` }}>
         <img src={menu.img} alt={menu.name} />
@@ -75,21 +89,24 @@ function Option() {
               <div className="text-sm font-bold  py-1">
                 {option.title} {option.essential && <span className=" text-rose-500 text-xs">(필수 선택)</span>}
               </div>
-              {option.optionLists.map((optionList: OptionLists) => {
+              {option.optionLists.map((optionList: OptionLists, i) => {
                 return (
-                  <div className="w-full flex items-center text-xs py-1 cursor-pointer" key={optionList.id}>
+                  <div className="w-full flex items-center text-xs py-1 cursor-pointer" key={i}>
                     <input
-                      id={optionList.id}
+                      id={'checkbox' + option.id + i}
                       type="checkbox"
                       className="w-4 h-4 accent-rose-500  cursor-pointer"
                       checked={optionList.isSelected}
-                      onChange={(e) => {
-                        dispatch(optionSelectedHandler({ optionId: option.id, optionListId: optionList.id }));
+                      onChange={() => {
+                        dispatch(optionSelectedHandler({ optionId: option.id, index: i }));
                       }}
                     />
                     <label
-                      htmlFor={optionList.id}
+                      htmlFor={'checkbox' + option.id + i}
                       className="w-full flex items-center justify-between pl-1  cursor-pointer"
+                      onChange={() => {
+                        dispatch(optionSelectedHandler({ optionId: option.id, index: i }));
+                      }}
                     >
                       <div>{optionList.name}</div>
                       {optionList.price === 0 ? (
@@ -109,8 +126,8 @@ function Option() {
           <div className="flex items-center justify-around gap-x-4">
             <div
               className={`${
-                amount === 1 ? 'text-gray-200' : ' cursor-pointer'
-              } material-symbols-outlined rounded-full border border-gray-200`}
+                amount === 1 ? 'text-gray-200 border-gray-200' : ' cursor-pointer border-black'
+              } material-symbols-outlined rounded-full border `}
               onClick={() => {
                 if (amount > 1) {
                   setAmount(amount - 1);
@@ -121,7 +138,7 @@ function Option() {
             </div>
             <div>{amount}</div>
             <div
-              className="material-symbols-outlined rounded-full"
+              className="material-symbols-outlined "
               onClick={() => {
                 setAmount(amount + 1);
               }}
@@ -135,8 +152,25 @@ function Option() {
           <div className="text-rose-500 font-bold">{totalPrice.toLocaleString()}원</div>
         </div>
       </div>
-      <div className="w-full px-2 py-4 flex justify-center items-center shadow shadow-black ">
-        <button className="w-full p-2 text-white bg-rose-500 rounded-lg text-sm font-semibold">
+      <div className="w-full px-2 py-4 flex justify-center items-center custom_shadow ">
+        <button
+          type="button"
+          className="w-full p-2 text-white bg-rose-500 rounded-lg text-sm font-semibold"
+          onClick={() => {
+            dispatch(
+              addCart({
+                table: table,
+                menuId: menuId,
+                name: menu.name,
+                options: selectedOptions,
+                img: menu.img,
+                price: totalPrice,
+                amount: amount,
+              }),
+            );
+            modalHandler('optionModalIsOpen', false);
+          }}
+        >
           {totalPrice.toLocaleString()}원 담기
         </button>
       </div>
@@ -144,4 +178,4 @@ function Option() {
   );
 }
 
-export default Option;
+export default OptionModal;

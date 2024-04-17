@@ -2,10 +2,12 @@ import { Action, ThunkAction, combineReducers, configureStore } from '@reduxjs/t
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
+import cartSliceReducer from './reducers/cartSlice';
 import categorysSliceReducer from './reducers/categorysSlice';
 import loginStateSliceReducer from './reducers/loginStateSlice';
 import menusSliceReducer from './reducers/menusSlice';
 import optionsSliceReducer from './reducers/optionsSlice';
+import orderSliceReducer from './reducers/orderSlice';
 import ownersApprovalSliceReducer from './reducers/ownersApprovalSlice';
 import ownersSliceReducer from './reducers/ownersSlice';
 import topExposureMenusSliceReducer from './reducers/topExposureMenusSlice';
@@ -20,12 +22,14 @@ const reducer = combineReducers({
   owners: ownersSliceReducer,
   ownersApproval: ownersApprovalSliceReducer,
   loginState: loginStateSliceReducer,
+  cart: cartSliceReducer,
+  order: orderSliceReducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['owners', 'ownersApproval', 'loginState', 'categorys', 'menus'],
+  whitelist: ['owners', 'ownersApproval', 'loginState', 'categorys', 'menus', 'options', 'cart', 'order'],
 };
 
 export const store = configureStore({

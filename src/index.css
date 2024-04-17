@@ -18,3 +18,7 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.custom_shadow {
+  box-shadow: 0 -4px 4px #94a3b8;
+}

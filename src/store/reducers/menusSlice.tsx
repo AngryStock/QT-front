@@ -102,7 +102,17 @@ export const menusSlice = createSlice({
       img: '/images/tuna_30cm.png',
     },
   ],
-  reducers: {},
+  reducers: {
+    addMenu(state, action) {
+      state.push(action.payload);
+    },
+    deleteMenu(state, action) {
+      const targetIndex = state.findIndex((menu) => menu.id === action.payload);
+      state.splice(targetIndex, 1);
+    },
+  },
 });
+
+export const { addMenu, deleteMenu } = menusSlice.actions;
 
 export default menusSlice.reducer;

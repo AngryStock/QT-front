@@ -90,3 +90,14 @@ export const documentDownloadApi = async (url: string) => {
     console.error('Download error:', error);
   }
 };
+
+export const singleImageUploadApi = async (file: File) => {
+  const formData = new FormData();
+  formData.append('singleimage', file);
+  const res = await axios.post('http://localhost:3000/upload/single', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res.data;
+};

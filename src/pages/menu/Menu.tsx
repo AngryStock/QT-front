@@ -1,40 +1,74 @@
 import { useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
+import { Cart } from '@/store/reducers/cartSlice';
 import { Category } from '@/store/reducers/categorysSlice';
 import { Menus } from '@/store/reducers/menusSlice';
+import { Owner } from '@/store/reducers/ownersSlice';
 
 import { useAppSelector } from '../../store/hooks';
 
-interface MenusItem {
-  id: number;
-  category: string;
-  name: string;
-  description: string;
-  price: number;
-  img: string;
-}
-function Menu() {
-  const navigate = useNavigate();
+import CartModal from './modal/CartModal';
+import OptionModal from './modal/OptionModal';
+import OrderCompleteModal from './modal/OrderCompleteModal';
 
+function Menu() {
+  const { id, table } = useParams();
   const topExposure = useAppSelector((state) => state.topExposure);
   const topExporsureMenus = useAppSelector((state) => state.topExposureMenus);
   const categorys: Category[] = useAppSelector((state) => state.categorys);
   const menus: Menus[] = useAppSelector((state) => state.menus);
   const [selectCategory, setSelectCategory] = useState(topExposure);
+  const [menuId, setMenuId] = useState('');
+  const owner: Owner = useAppSelector((state) => state.owners).find((owner: Owner) => owner.id === id);
+  const cart = useAppSelector((state) => state.cart);
+
+  const [modal, setModal] = useState({
+    optionModalIsOpen: false,
+    cartModalIsOpen: false,
+    orderCompleteModalIsOpen: false,
+  });
+
+  const modalHandler = (name: string, value: boolean) => {
+    setModal((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
 
   function scrollToElement(a: string) {
     const element = document.getElementById(a);
     element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  const totalAmount = cart.reduce((totalAmount: number, cart: Cart) => totalAmount + cart.amount, 0);
+
   return (
     <div className="w-full h-full">
+      {modal.optionModalIsOpen && <OptionModal menuId={menuId} modalHandler={modalHandler} table={table} />}
+      {modal.cartModalIsOpen && (
+        <CartModal modalHandler={modalHandler} businessName={owner.businessName} table={table} />
+      )}
+      {modal.orderCompleteModalIsOpen && <OrderCompleteModal modalHandler={modalHandler} table={table} />}
       <header className="w-full flex items-center h-12 justify-center text-center">
         <div className="w-1/5 material-symbols-outlined ">search</div>
-        <div className="w-3/5 font-bold ">서브웨이-고덕역점</div>
-        <div className="w-1/5 material-symbols-outlined ">shopping_cart</div>
+        <div className="w-3/5 font-bold ">{owner.businessName}</div>
+        <div className="w-1/5 relative flex justify-center items-center">
+          <div
+            className=" material-symbols-outlined relative cursor-pointer"
+            onClick={() => {
+              modalHandler('cartModalIsOpen', true);
+            }}
+          >
+            shopping_cart
+          </div>
+          {totalAmount !== 0 && (
+            <div className="w-5 h-5 bg-rose-500 absolute top-1/2 left-1/2 rounded-full text-sm text-white">
+              {totalAmount}
+            </div>
+          )}
+        </div>
       </header>
       <div className="flex py-2  overflow-x-scroll overflow-hidden border-y scrollbar-hide">
         <button
@@ -71,13 +105,14 @@ function Menu() {
             {topExposure}
           </div>
           <div className="flex gap-2  overflow-x-scroll pt-4 border-t scrollbar-hide">
-            {topExporsureMenus.map((menu: MenusItem, i: number) => {
+            {topExporsureMenus.map((menu: Menus, i: number) => {
               return (
                 <div
                   className="w-[128px] whitespace-nowrap rounded-lg bg-white p-2"
                   key={i}
                   onClick={() => {
-                    navigate(`/option/${menu.id}`);
+                    setMenuId(menu.id);
+                    modalHandler('optionModalIsOpen', true);
                   }}
                 >
                   {/* <div
@@ -110,7 +145,14 @@ function Menu() {
                 .filter((menu) => menu.categoryId === category.id)
                 .map((menu) => {
                   return (
-                    <div className="w-full flex justify-center items-center py-4 border-t" key={menu.id}>
+                    <div
+                      className="w-full flex justify-center items-center py-4 border-t"
+                      key={menu.id}
+                      onClick={() => {
+                        setMenuId(menu.id);
+                        modalHandler('optionModalIsOpen', true);
+                      }}
+                    >
                       <div className="w-full mr-2">
                         <div>{menu.name}</div>
                         <div className="text-xs text-gray-500">{menu.description}</div>
