@@ -23,6 +23,7 @@ export default function Order() {
         {tabNames.map((tab, i) => {
           return (
             <div
+              key={i}
               onClick={() => {
                 Setselected(tab);
               }}

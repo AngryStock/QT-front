@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 
 import CustomDropdown from '@/component/CustomDropdown';
 import { useAppSelector } from '@/store/hooks';
-import { Owner } from '@/store/reducers/ownersSlice';
 
 import styles from './Main.module.css';
 import LoginModal from './modal/LoginModal';
@@ -27,7 +26,7 @@ function Main() {
     }));
   };
 
-  const loginState: Owner = useAppSelector((state) => state.loginState);
+  const loginState = useAppSelector((state) => state.loginState);
   useEffect(() => {
     if (loginState) {
       navigate(`/owner/${loginState.id}`);

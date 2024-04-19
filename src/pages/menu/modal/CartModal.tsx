@@ -1,27 +1,26 @@
 import { ModalHandler } from '@/pages/owner/component/MenuManagement';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { Cart, deleteAllCart, deleteCart, setCartAmount } from '@/store/reducers/cartSlice';
+import { Cart, deleteAllCart } from '@/store/reducers/cartSlice';
 import { addOrder } from '@/store/reducers/orderSlice';
 
 interface CartModalPops {
   modalHandler: ModalHandler;
   businessName: string;
   table: string | undefined;
+  publish: (text: string) => void;
 }
 
-function CartModal({ modalHandler, businessName, table }: CartModalPops) {
+function CartModal({ modalHandler, businessName, table, publish }: CartModalPops) {
   const dispatch = useAppDispatch();
   const cart: Cart[] = useAppSelector((state) => state.cart);
   const totalPrice = cart.reduce((totalPrice: number, cart: Cart) => totalPrice + cart.price * cart.amount, 0);
   const totalAmount = cart.reduce((totalAmount: number, cart: Cart) => totalAmount + cart.amount, 0);
 
-  console.log(totalPrice);
-
   return (
     <div className="absolute w-full h-full z-20 bg-white">
       <header className="w-full flex items-center justify-center h-12 border-b text-center">
         <div
-          className="w-1/5 material-symbols-outlined"
+          className="w-1/5 material-symbols-outlined cursor-pointer"
           onClick={() => {
             modalHandler('cartModalIsOpen', false);
           }}
@@ -37,23 +36,30 @@ function CartModal({ modalHandler, businessName, table }: CartModalPops) {
             <div className="text-sm">
               {businessName}({table}번 테이블)
             </div>
-            <div className=" text-slate-400 text-xs">전체삭제</div>
+            <div
+              className=" text-slate-400 text-xs cursor-pointer"
+              onClick={() => {
+                publish(JSON.stringify({ type: 'allDel' }));
+              }}
+            >
+              전체삭제
+            </div>
           </div>
           {cart.map((item) => {
             return (
               <div className="w-full px-2 py-4 border-b border-slate-300" key={item.id}>
                 <div className="w-full gap-2 flex">
-                  <img src={item.img} alt={item.name} className="rounded-lg w-[60px] h-[43px]" />
-                  <div className="">
+                  <img src={`/api/image/${item.img}`} alt={item.name} className="rounded-lg w-[60px] h-[43px]" />
+                  <div className="flex-grow">
                     <div className=" text-sm">{item.name}</div>
                     <div className="text-xs text-slate-500">{item.options.join(', ')}</div>
                     <div className=" font-bold text-sm">{item.price.toLocaleString()}원</div>
                   </div>
                   <img
                     src="/images/close.png"
-                    className="w-[18px] h-[18px]"
+                    className="w-[18px] h-[18px] cursor-pointer"
                     onClick={() => {
-                      dispatch(deleteCart(item.id));
+                      publish(JSON.stringify({ type: 'del', cartId: item.id }));
                     }}
                   />
                 </div>
@@ -65,7 +71,7 @@ function CartModal({ modalHandler, businessName, table }: CartModalPops) {
                       } material-symbols-outlined  `}
                       onClick={() => {
                         if (item.amount > 1) {
-                          dispatch(setCartAmount({ id: item.id, amount: item.amount - 1 }));
+                          publish(JSON.stringify({ type: 'set', cartId: item.id, amount: item.amount - 1 }));
                         }
                       }}
                     >
@@ -73,9 +79,9 @@ function CartModal({ modalHandler, businessName, table }: CartModalPops) {
                     </div>
                     <div className=" text-sm">{item.amount}</div>
                     <div
-                      className="material-symbols-outlined "
+                      className="material-symbols-outlined cursor-pointer "
                       onClick={() => {
-                        dispatch(setCartAmount({ id: item.id, amount: item.amount + 1 }));
+                        publish(JSON.stringify({ type: 'set', cartId: item.id, amount: item.amount + 1 }));
                       }}
                     >
                       add
@@ -99,7 +105,7 @@ function CartModal({ modalHandler, businessName, table }: CartModalPops) {
         <div className="w-full border rounded-lg border-slate-300 p-2 text-sm">
           <div className="h-10 flex justify-between items-center">
             <div>결제수단</div>
-            <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center cursor-pointer">
               <div>변경</div>
               <div className=" material-symbols-outlined">navigate_next</div>
             </div>

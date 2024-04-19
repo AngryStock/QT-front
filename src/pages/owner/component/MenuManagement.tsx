@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { Category, deleteCategory } from '@/store/reducers/categorysSlice';
-import { Menus, deleteMenu } from '@/store/reducers/menusSlice';
+import { Category, deleteCategory, setCategory } from '@/store/reducers/categorysSlice';
+import { Menus, deleteMenu, setMenu } from '@/store/reducers/menusSlice';
 
 import ContentsAddModal from '../modal/ContentsAddModal';
 import MenuEditModal from '../modal/MenuEditModal';
@@ -33,6 +36,16 @@ function MenuManagement() {
 
   const categorys: Category[] = useAppSelector((state) => state.categorys);
   const menus: Menus[] = useAppSelector((state) => state.menus);
+  const { id } = useParams();
+
+  useEffect(() => {
+    axios.get(`/api/category/find/storeId/${id}`).then((res1) => {
+      dispatch(setCategory(res1.data));
+      axios.get(`/api/menu/find/storeId/${id}`).then((res2) => {
+        dispatch(setMenu(res2.data));
+      });
+    });
+  }, [dispatch, id]);
 
   const modalHandler = (name: string, value: boolean) => {
     setModal((prevState) => ({
@@ -96,11 +109,13 @@ function MenuManagement() {
                 className="w-full flex items-center justify-between"
                 onMouseOver={() => mouseHoveringHandler(category.id)}
                 onMouseLeave={() => mouseHoveringHandler('')}
-                onClick={() => {
-                  categoryIsOpenHandler(category.id);
-                }}
               >
-                <div className="flex items-center">
+                <div
+                  className="flex items-center"
+                  onClick={() => {
+                    categoryIsOpenHandler(category.id);
+                  }}
+                >
                   {categoryIsOpen.includes(category.id) ? (
                     <span className="material-symbols-outlined">arrow_drop_down</span>
                   ) : (
@@ -113,7 +128,11 @@ function MenuManagement() {
                   <div
                     className="material-symbols-outlined"
                     onClick={() => {
-                      dispatch(deleteCategory(category.id));
+                      axios.get(`/api/category/delete/${category.id}`).then((res) => {
+                        if (res.data.statusCode === 200) {
+                          dispatch(deleteCategory(category.id));
+                        }
+                      });
                     }}
                   >
                     delete
@@ -131,7 +150,10 @@ function MenuManagement() {
                             onMouseOver={() => mouseHoveringHandler(menu.id)}
                             onMouseLeave={() => mouseHoveringHandler('')}
                           >
-                            <img src={menu.img} className="w-[224px] h-[160px] rounded-lg mb-2 absolute" />
+                            <img
+                              src={`/api/image/${menu.menuImageUrl}`}
+                              className="w-[224px] h-[160px] rounded-lg mb-2 absolute"
+                            />
                             {deleteHovering === `${menu.id}` && (
                               <div className=" absolute w-[224px] h-[160px] flex justify-center items-center gap-2">
                                 <button
@@ -145,7 +167,11 @@ function MenuManagement() {
                                 </button>
                                 <button
                                   onClick={() => {
-                                    dispatch(deleteMenu(menu.id));
+                                    axios.get(`/api/menu/delete/${menu.id}`).then((res) => {
+                                      if (res.data.statusCode === 200) {
+                                        dispatch(deleteMenu(menu.id));
+                                      }
+                                    });
                                   }}
                                 >
                                   <img src="/images/delete.png" />

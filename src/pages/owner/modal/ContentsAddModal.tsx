@@ -1,5 +1,8 @@
 import { useState } from 'react';
 
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+
 import { useAppDispatch } from '@/store/hooks';
 import { addCategory } from '@/store/reducers/categorysSlice';
 import { addCategoryOfOptions, addOptionLists } from '@/store/reducers/optionsSlice';
@@ -18,16 +21,30 @@ function ContentsAddModal({ modalHandler, additionalType, menuId, optionId }: Co
 
   const [categoryText, setCategoryText] = useState('');
 
+  const { id } = useParams();
+
   const toggleModal = () => modalHandler('contentsAddModalIsOpen', false);
 
-  const addCategoryHandler = () => {
+  const addCategoryHandler = async () => {
     if (categoryText !== '') {
       if (additionalType === 'category') {
-        dispatch(addCategory(categoryText));
+        const categroyNames = categoryText.split(',');
+        await axios.post('/api/category/add', { storeId: id, value: categroyNames }).then((res) => {
+          dispatch(addCategory(res.data));
+        });
       } else if (additionalType === 'category of options') {
-        dispatch(addCategoryOfOptions({ optionCategoryNames: categoryText, menuId: menuId }));
+        const optionCategoryNames = categoryText.split(',');
+        await axios.post('/api/optionCategory/add', { menuId: menuId, value: optionCategoryNames }).then((res) => {
+          dispatch(addCategoryOfOptions(res.data));
+        });
+        // dispatch(addCategoryOfOptions({ optionCategoryNames: categoryText, menuId: menuId }));
       } else if (additionalType === 'option') {
-        dispatch(addOptionLists({ optionNames: categoryText, optionId: optionId }));
+        const optionNames = categoryText.split(',');
+        console.log(optionId, optionNames);
+        await axios.post('/api/menuOption/add', { optionCategoryId: optionId, value: optionNames }).then((res) => {
+          console.log(res.data);
+          dispatch(addOptionLists({ optionId: optionId, value: res.data }));
+        });
       }
     }
   };

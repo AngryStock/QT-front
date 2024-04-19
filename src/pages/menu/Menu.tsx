@@ -1,34 +1,126 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import * as StompJs from '@stomp/stompjs';
+import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
-import { Cart } from '@/store/reducers/cartSlice';
-import { Category } from '@/store/reducers/categorysSlice';
-import { Menus } from '@/store/reducers/menusSlice';
-import { Owner } from '@/store/reducers/ownersSlice';
+import { Cart, addCart, deleteAllCart, deleteCart, setCart, setCartAmount } from '@/store/reducers/cartSlice';
+import { Category, setCategory } from '@/store/reducers/categorysSlice';
+import { Menus, setMenu } from '@/store/reducers/menusSlice';
 
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 
 import CartModal from './modal/CartModal';
 import OptionModal from './modal/OptionModal';
 import OrderCompleteModal from './modal/OrderCompleteModal';
 
 function Menu() {
+  const dispatch = useAppDispatch();
   const { id, table } = useParams();
-  const topExposure = useAppSelector((state) => state.topExposure);
-  const topExporsureMenus = useAppSelector((state) => state.topExposureMenus);
   const categorys: Category[] = useAppSelector((state) => state.categorys);
   const menus: Menus[] = useAppSelector((state) => state.menus);
-  const [selectCategory, setSelectCategory] = useState(topExposure);
+  const [selectCategory, setSelectCategory] = useState('');
   const [menuId, setMenuId] = useState('');
-  const owner: Owner = useAppSelector((state) => state.owners).find((owner: Owner) => owner.id === id);
+  const client = useRef<StompJs.Client | null>(null);
+  const [owner, setOwner] = useState({ name: '가게명' });
   const cart = useAppSelector((state) => state.cart);
+
+  useEffect(() => {
+    axios.get(`/api/category/find/storeId/${id}`).then((res1) => {
+      dispatch(setCategory(res1.data));
+      axios.get(`/api/menu/find/storeId/${id}`).then((res2) => {
+        dispatch(setMenu(res2.data));
+      });
+    });
+    axios.get(`/api/cart/find/storeId/${id}/table/${table}`).then((res) => {
+      dispatch(setCart(res.data));
+    });
+
+    axios.get(`/api/store/find/${id}`).then((res) => {
+      setOwner(res.data);
+    });
+  }, [dispatch, id, table]);
+
+  useEffect(() => {
+    axios.get(`/api/cart/find/storeId/${id}/table/${table}`).then((res) => {
+      dispatch(setCart(res.data));
+    });
+  }, [dispatch, id, table]);
 
   const [modal, setModal] = useState({
     optionModalIsOpen: false,
     cartModalIsOpen: false,
     orderCompleteModalIsOpen: false,
   });
+
+  useEffect(() => {
+    connect();
+
+    return () => {
+      if (client.current) {
+        disconnect();
+      }
+    };
+  }, []);
+
+  const connect = () => {
+    client.current = new StompJs.Client({
+      brokerURL: `ws://localhost:8080/ws-stomp/websocket`, // 웹소켓 서버로 직접 접속
+      reconnectDelay: 5000,
+      // webSocketFactory: () => new SockJS('/ws-stomp'), // proxy를 통한 접속
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      onConnect: () => {
+        subscribe();
+      },
+      onStompError: (frame) => {
+        console.error(frame);
+      },
+    });
+
+    client.current.activate();
+  };
+
+  const disconnect = () => {
+    if (client.current) {
+      client.current.deactivate();
+    }
+  };
+
+  const subscribe = () => {
+    if (client.current) {
+      client.current.subscribe(`/sub/cart/table/${id}/${table}`, (message) => {
+        console.log(JSON.parse(message.body));
+        const newMessage = JSON.parse(message.body);
+        if (newMessage.type === 'add') {
+          dispatch(addCart(newMessage.cartDTO));
+        } else if (newMessage.type === 'set') {
+          dispatch(setCartAmount({ id: newMessage.cartId, amount: newMessage.amount }));
+        } else if (newMessage.type === 'del') {
+          dispatch(deleteCart(newMessage.cartId));
+        } else if (newMessage.type === 'allDel') {
+          dispatch(deleteAllCart());
+        }
+      });
+    }
+  };
+
+  const publish = (text: string) => {
+    if (client.current && client.current.connected) {
+      client.current.publish({
+        destination: `/pub/cart/table/${id}/${table}`,
+        body: text,
+      });
+    }
+  };
+  // const order = (text: string) => {
+  //   if (client.current && client.current.connected) {
+  //     client.current.publish({
+  //       destination: `/sub/order/table/${id}/${table}`,
+  //       body: text,
+  //     });
+  //   }
+  // };
 
   const modalHandler = (name: string, value: boolean) => {
     setModal((prevState) => ({
@@ -46,32 +138,32 @@ function Menu() {
 
   return (
     <div className="w-full h-full">
-      {modal.optionModalIsOpen && <OptionModal menuId={menuId} modalHandler={modalHandler} table={table} />}
+      {modal.optionModalIsOpen && (
+        <OptionModal menuId={menuId} modalHandler={modalHandler} table={table} publish={publish} storeId={id} />
+      )}
       {modal.cartModalIsOpen && (
-        <CartModal modalHandler={modalHandler} businessName={owner.businessName} table={table} />
+        <CartModal modalHandler={modalHandler} businessName={owner.name} table={table} publish={publish} />
       )}
       {modal.orderCompleteModalIsOpen && <OrderCompleteModal modalHandler={modalHandler} table={table} />}
       <header className="w-full flex items-center h-12 justify-center text-center">
-        <div className="w-1/5 material-symbols-outlined ">search</div>
-        <div className="w-3/5 font-bold ">{owner.businessName}</div>
-        <div className="w-1/5 relative flex justify-center items-center">
-          <div
-            className=" material-symbols-outlined relative cursor-pointer"
-            onClick={() => {
-              modalHandler('cartModalIsOpen', true);
-            }}
-          >
-            shopping_cart
-          </div>
+        <div className="w-1/5 material-symbols-outlined cursor-pointer">search</div>
+        <div className="w-3/5 font-bold ">{owner.name}</div>
+        <div
+          className="w-1/5 relative flex justify-center items-center cursor-pointer"
+          onClick={() => {
+            modalHandler('cartModalIsOpen', true);
+          }}
+        >
+          <div className=" material-symbols-outlined relative ">shopping_cart</div>
           {totalAmount !== 0 && (
-            <div className="w-5 h-5 bg-rose-500 absolute top-1/2 left-1/2 rounded-full text-sm text-white">
+            <div className="w-5 h-5 bg-rose-500 absolute top-1/2 left-1/2 rounded-full text-sm text-white ">
               {totalAmount}
             </div>
           )}
         </div>
       </header>
       <div className="flex py-2  overflow-x-scroll overflow-hidden border-y scrollbar-hide">
-        <button
+        {/* <button
           className={`${
             topExposure === selectCategory ? 'bg-rose-500 text-white' : ''
           } whitespace-nowrap rounded-full py-1 px-2 ml-2 text-sm`}
@@ -81,7 +173,7 @@ function Menu() {
           }}
         >
           {topExposure}
-        </button>
+        </button> */}
         {categorys.map((category) => {
           return (
             <button
@@ -100,7 +192,7 @@ function Menu() {
         })}
       </div>
       <div className=" overflow-y-scroll overflow-hidden" style={{ height: `calc(100% - 96px)` }}>
-        <div className="p-4  bg-gray-300">
+        {/* <div className="p-4  bg-gray-300">
           <div className="font-bold" id={topExposure}>
             {topExposure}
           </div>
@@ -115,16 +207,13 @@ function Menu() {
                     modalHandler('optionModalIsOpen', true);
                   }}
                 >
-                  {/* <div
-                    style={{
-                      backgroundImage: `url(${menu.img})`,
-                      backgroundPosition: 'center',
-                      backgroundSize: 'contain',
-                      backgroundRepeat: 'no-repeat',
-                    }}
-                    className="w-[112px] h-[80px] rounded-lg"
-                  ></div> */}
-                  <img src={menu.img} alt={menu.name} width={112} className=" rounded-lg" />
+                  <img
+                    src={`/api/images/${menu.menuImageUrl}`}
+                    alt={menu.name}
+                    width={112}
+                    height={80}
+                    className=" rounded-lg"
+                  />
                   <div className="text-sm font-bold overflow-hidden text-ellipsis mt-2">{menu.name}</div>
                   <div className="text-sm">
                     <span>{menu.price.toLocaleString()}</span>
@@ -134,7 +223,7 @@ function Menu() {
               );
             })}
           </div>
-        </div>
+        </div> */}
         {categorys.map((category) => {
           return (
             <div className="pt-4 px-4 border-b-8" key={category.id}>
@@ -146,7 +235,7 @@ function Menu() {
                 .map((menu) => {
                   return (
                     <div
-                      className="w-full flex justify-center items-center py-4 border-t"
+                      className="w-full flex justify-center items-center py-4 border-t cursor-pointer"
                       key={menu.id}
                       onClick={() => {
                         setMenuId(menu.id);
@@ -161,7 +250,11 @@ function Menu() {
                           <span>원</span>
                         </div>
                       </div>
-                      <img src={menu.img} alt={menu.name} width={112} className=" rounded-lg border" />
+                      <img
+                        src={`/api/image/${menu.menuImageUrl}`}
+                        alt={menu.name}
+                        className=" rounded-lg border h-[80px] w-[112px] bg-cover"
+                      />
                     </div>
                   );
                 })}

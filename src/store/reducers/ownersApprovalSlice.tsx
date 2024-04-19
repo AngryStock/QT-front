@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface OwnersApproval {
-  id?: string;
+  storeId?: string;
   businessNumber: string;
   ownerId: string;
   password: string;
@@ -32,7 +32,7 @@ export const ownersApprovalSlice = createSlice({
       state.push(onwnerInform);
     },
     refuseSignup(state: OwnersApproval[], action) {
-      const targetIndex = state.findIndex((owner) => owner.id === action.payload);
+      const targetIndex = state.findIndex((owner) => owner.storeId === action.payload);
       state.splice(targetIndex, 1);
     },
   },

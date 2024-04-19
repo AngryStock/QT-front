@@ -3,9 +3,6 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { signup } from '@/store/reducers/ownersApprovalSlice';
-import { Owner } from '@/store/reducers/ownersSlice';
 import { signupApi } from '@/util/api-util';
 import { regenerateAddress } from '@/util/stringHelpers';
 
@@ -34,8 +31,6 @@ export interface IsUserInform {
 }
 
 function SigninModal({ modalHandler }: SigninModalProps) {
-  const dispatch = useAppDispatch();
-
   const [files, setFiles] = useState<Files>({
     businessReportCertificateFileName: '',
     businessRegistrationFileName: '',
@@ -55,19 +50,19 @@ function SigninModal({ modalHandler }: SigninModalProps) {
   });
 
   const [userInform, setUserInform] = useState({
-    businessNumber: '',
-    ownerId: '',
-    password: '',
-    passwordCheck: '',
-    businessName: '',
-    representativeName: '',
-    representativeCellPhoneNumber: '',
-    storePhoneNumber: '',
-    email: '',
-    address: '',
-    detailedAddress: '',
-    bank: '',
-    accountNumber: '',
+    businessNumber: '2467100227',
+    ownerId: 'test',
+    password: 'didgmldlf12!@',
+    passwordCheck: 'didgmldlf12!@',
+    businessName: '양희일',
+    representativeName: '양희일',
+    representativeCellPhoneNumber: '01012341234',
+    storePhoneNumber: '01012341234',
+    email: 'myid7771@naver.com',
+    address: '서울시 강동구 고덕동 아리수로 246',
+    detailedAddress: '201',
+    bank: '우리은행',
+    accountNumber: '1002134456357',
   });
 
   const toggleModal = () => modalHandler('signinModalIsOpen', false);
@@ -79,45 +74,46 @@ function SigninModal({ modalHandler }: SigninModalProps) {
       return;
     }
 
-    dispatch(
-      signup({
-        businessNumber: userInform.businessNumber,
-        ownerId: userInform.ownerId,
-        password: userInform.password,
-        passwordCheck: userInform.passwordCheck,
-        businessName: userInform.businessName,
-        representativeName: userInform.representativeName,
-        representativeCellPhoneNumber: userInform.representativeCellPhoneNumber,
-        storePhoneNumber: userInform.storePhoneNumber,
-        email: userInform.email,
-        address: userInform.address,
-        detailedAddress: userInform.detailedAddress,
-        bank: userInform.bank,
-        accountNumber: userInform.accountNumber,
-        businessReportCertificateFileName: files.businessReportCertificateFileName,
-        businessRegistrationFileName: files.businessRegistrationFileName,
-        copyOfBankbookFileName: files.copyOfBankbookFileName,
-        businessReportCertificateFileUrl: res.businessReportCertificateFileUrl,
-        businessRegistrationFileUrl: res.businessRegistrationFileUrl,
-        copyOfBankbookFileUrl: res.copyOfBankbookFileUrl,
-        date: res.date,
-      }),
-    );
-    toggleModal();
-    modalHandler('submittedModalIsOpen', true);
+    await axios
+      .post('/api/signup', {
+        ceo: {
+          name: userInform.representativeName,
+          mobileNumber: userInform.representativeCellPhoneNumber,
+          loginId: userInform.ownerId,
+          password: userInform.password,
+          bank: userInform.bank,
+          accountNumber: userInform.accountNumber,
+          email: userInform.email,
+          businessReportCertificateFileUrl: res.businessReportCertificateFileUrl,
+          businessRegistrationFileUrl: res.businessRegistrationFileUrl,
+          copyOfBankbookFileUrl: res.copyOfBankbookFileUrl,
+        },
+        store: {
+          name: userInform.businessName,
+          phoneNumber: userInform.storePhoneNumber,
+          mainAddress: userInform.address,
+          detailAddress: userInform.detailedAddress,
+          businessNumber: userInform.businessNumber,
+        },
+      })
+      .then(() => {
+        toggleModal();
+        modalHandler('submittedModalIsOpen', true);
+      })
+      .catch(() => {
+        alert('이미 등록된 사업자 등록번호 입니다.');
+      });
   };
 
-  const owners1 = useAppSelector((state) => state.owners);
-  const owners2 = useAppSelector((state) => state.ownersApproval);
-
-  const isOwnerIdAvailable = () => {
-    const ownerIds1 = owners1.map((owner: Owner) => owner.ownerId);
-    const ownerIds2 = owners2.map((owner: Owner) => owner.ownerId);
-    if (ownerIds1.includes(userInform.ownerId) || ownerIds2.includes(userInform.ownerId)) {
-      userIsInformChangeHandler(['isOwnerId'], ['already']);
-    } else {
-      userIsInformChangeHandler(['isOwnerId'], ['available']);
-    }
+  const isOwnerIdAvailable = async () => {
+    await axios.post('/api/available/ownerId', { ownerId: userInform.ownerId }).then((res) => {
+      console.log(res);
+      if (res.data === '이미 존재하는 아이디입니다.') {
+        userIsInformChangeHandler(['isOwnerId'], ['already']);
+      } else {
+        userIsInformChangeHandler(['isOwnerId'], ['available']);
+      }
+    });
   };
 
   const fileChangeHandler = (files: { name: string; value: File | string }[]) => {

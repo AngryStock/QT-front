@@ -10,14 +10,10 @@ import optionsSliceReducer from './reducers/optionsSlice';
 import orderSliceReducer from './reducers/orderSlice';
 import ownersApprovalSliceReducer from './reducers/ownersApprovalSlice';
 import ownersSliceReducer from './reducers/ownersSlice';
-import topExposureMenusSliceReducer from './reducers/topExposureMenusSlice';
-import topExposureSliceReducer from './reducers/topExposureSlice';
 
 const reducer = combineReducers({
   menus: menusSliceReducer,
   categorys: categorysSliceReducer,
-  topExposure: topExposureSliceReducer,
-  topExposureMenus: topExposureMenusSliceReducer,
   options: optionsSliceReducer,
   owners: ownersSliceReducer,
   ownersApproval: ownersApprovalSliceReducer,
@@ -29,7 +25,7 @@ const reducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['owners', 'ownersApproval', 'loginState', 'categorys', 'menus', 'options', 'cart', 'order'],
+  whitelist: ['loginState'],
 };
 
 export const store = configureStore({

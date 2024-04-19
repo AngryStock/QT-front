@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 import { useAppDispatch } from '@/store/hooks';
 import { addMenu } from '@/store/reducers/menusSlice';
@@ -21,7 +21,6 @@ function MenuEditModal({ modalHandler, categoryId }: MenuEditModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [img, setImg] = useState('no_image.png');
 
   const fileChangeHandler = (name: string, file: File) => {
     setImageFileName(name);
@@ -31,18 +30,19 @@ function MenuEditModal({ modalHandler, categoryId }: MenuEditModalProps) {
   const addMenuApiHandler = async () => {
     if (imageFile) {
       const res = await singleImageUploadApi(imageFile);
-      setImg(res.img);
+      await axios
+        .post('/api/menu/save', {
+          categoryId: categoryId,
+          name: name,
+          description: description,
+          price: price,
+          menuImageUrl: res.menuImageFileUrl,
+        })
+        .then((res) => {
+          dispatch(addMenu(res.data));
+          modalHandler('menuEditModalIsOpen', false);
+        });
     }
-    dispatch(
-      addMenu({
-        id: uuidv4(),
-        categoryId: categoryId,
-        name: name,
-        description: description,
-        price: price,
-        img: '/images/' + img,
-      }),
-    );
   };
 
   return (

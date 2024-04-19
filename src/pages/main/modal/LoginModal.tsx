@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import axios from 'axios';
+
+import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/reducers/loginStateSlice';
-import { Owner } from '@/store/reducers/ownersSlice';
 
 type ModalHandler = (name: string, value: boolean) => void;
 
@@ -18,24 +19,25 @@ function LoginModal({ modalHandler }: LoginModalProps) {
   const [password, setPassword] = useState('');
   const [keepLogin, setKeepLogin] = useState(true);
 
-  const owners: Owner[] = useAppSelector((state) => state.owners);
-
   const loginApiHandler = async () => {
-    const target = owners.find((owner) => owner.ownerId === ownerId);
-    if (target === undefined) {
-      alert('없는 아이디 입니다');
-      setOwnerId('');
-      setPassword('');
-      return;
-    } else if (target.password !== password) {
-      alert('잘못된 비밀번호 입니다.');
-      setPassword('');
-
-      return;
-    } else if (target.password === password) {
-      dispatch(login(target));
-      toggleModal();
-    }
+    const formData = new FormData();
+    formData.append('username', ownerId);
+    formData.append('password', password);
+    await axios
+      .post('/api/login', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          axios.get('/api/currentStore').then((res) => {
+            console.log(res.data[0]);
+            dispatch(login({ id: res.data[0].id }));
+            toggleModal();
+          });
+        }
+      });
   };
 
   return (

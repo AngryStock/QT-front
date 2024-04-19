@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import * as StompJs from '@stomp/stompjs';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/reducers/loginStateSlice';
@@ -14,6 +15,9 @@ export default function OwnerMain() {
   const dispatch = useAppDispatch();
   const subjects = ['주문내역', '매출내역', '상품관리', 'QR발급'];
   const [isOpen, setIsOpen] = useState([true, false, false, false]);
+  const client = useRef<StompJs.Client | null>(null);
+  const { id } = useParams();
+
   const subjectToggle = (i: number) => {
     const updateIsOpen = new Array(4).fill(false);
     updateIsOpen[i] = !updateIsOpen[i];
@@ -24,6 +28,59 @@ export default function OwnerMain() {
     dispatch(login(null));
     navigate('/');
   };
+
+  useEffect(() => {
+    connect();
+
+    return () => {
+      if (client.current) {
+        disconnect();
+      }
+    };
+  }, [id]); // id를 의존성 배열에 추가
+
+  const connect = () => {
+    client.current = new StompJs.Client({
+      brokerURL: `ws://localhost:8080/ws-stomp/websocket`, // 웹소켓 서버로 직접 접속
+      reconnectDelay: 5000,
+      // webSocketFactory: () => new SockJS('/ws-stomp'), // proxy를 통한 접속
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      onConnect: () => {
+        subscribe();
+      },
+      onStompError: (frame) => {
+        console.error(frame);
+      },
+    });
+
+    client.current.activate();
+  };
+
+  const disconnect = () => {
+    if (client.current) {
+      client.current.deactivate();
+    }
+  };
+
+  const subscribe = () => {
+    if (client.current) {
+      client.current.subscribe(`/sub/chat/room/${id}`, (message) => {
+        console.log(JSON.stringify(message.body));
+        // const newMessage = JSON.parse(message.body);
+      });
+    }
+  };
+
+  // const publish = (text: string) => {
+  //   e.preventDefault();
+  //   if (client.current && client.current.connected) {
+  //     client.current.publish({
+  //       destination: '/pub/chat/message',
+  //       body: text,
+  //     });
+  //   }
+  // };
 
   return (
     <div className="w-full h-full border-gray-700">

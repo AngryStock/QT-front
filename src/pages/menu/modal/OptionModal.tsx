@@ -1,23 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import axios from 'axios';
 
 import { ModalHandler } from '@/pages/owner/component/MenuManagement';
-import { Cart, addCart } from '@/store/reducers/cartSlice';
+import { Cart } from '@/store/reducers/cartSlice';
 import { Menus } from '@/store/reducers/menusSlice';
 
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { OptionLists, Options, optionSelectedHandler } from '../../../store/reducers/optionsSlice';
+import { OptionLists, Options, optionSelectedHandler, setOption } from '../../../store/reducers/optionsSlice';
 
 interface OptionModalPops {
   menuId: string;
   modalHandler: ModalHandler;
   table: string | undefined;
+  publish: (text: string) => void;
+  storeId: string | undefined;
 }
 
-function OptionModal({ menuId, modalHandler, table }: OptionModalPops) {
+function OptionModal({ menuId, modalHandler, table, publish, storeId }: OptionModalPops) {
   const dispatch = useAppDispatch();
 
   const menu = useAppSelector((state) => state.menus.find((menu: Menus) => menu.id === menuId));
   const options = useAppSelector((state) => state.options).filter((option: Options) => option.menuId === menuId);
+
+  useEffect(() => {
+    axios.get(`/api/menuOption//find/menuId/CategoryAndOption/${menuId}`).then((res3) => {
+      dispatch(setOption(res3.data));
+    });
+  }, [menuId, dispatch]);
+
   const cart = useAppSelector((state) => state.cart);
   const [amount, setAmount] = useState(1);
   const totalPrice =
@@ -25,7 +36,7 @@ function OptionModal({ menuId, modalHandler, table }: OptionModalPops) {
       (totalPrice: number, option: Options) =>
         totalPrice +
         option.optionLists.reduce((subTotalPrice, subOption) => {
-          if (subOption.isSelected) {
+          if (subOption.selected) {
             return subTotalPrice + subOption.price;
           }
           return subTotalPrice;
@@ -35,12 +46,10 @@ function OptionModal({ menuId, modalHandler, table }: OptionModalPops) {
     ) * amount;
 
   const selectedOptions = options.flatMap((option: Options) =>
-    option.optionLists.filter((list) => list.isSelected).map((list) => list.name),
+    option.optionLists.filter((list) => list.selected).map((list) => list.name),
   );
 
   const totalAmount = cart.reduce((totalAmount: number, cart: Cart) => totalAmount + cart.amount, 0);
-
-  console.log(selectedOptions);
 
   return (
     <div className="absolute w-full h-full z-20 bg-white">
@@ -71,7 +80,7 @@ function OptionModal({ menuId, modalHandler, table }: OptionModalPops) {
         </div>
       </header>
       <div className="w-full overflow-y-scroll" style={{ height: `calc(100% - 48px - 68px)` }}>
-        <img src={menu.img} alt={menu.name} />
+        <img src={`/api/image/${menu.menuImageUrl}`} alt={menu.name} />
         <div className="w-full bg-gray-200 text-xs text-center text-gray-500">
           위 사진은 연출된 사진으로, 실제와 다를 수 있습니다.
         </div>
@@ -85,7 +94,7 @@ function OptionModal({ menuId, modalHandler, table }: OptionModalPops) {
         </div>
         {options.map((option: Options) => {
           return (
-            <div className="w-full border-b p-2" key={option.id}>
+            <div className="w-full border-b p-2" key={option.categoryId}>
               <div className="text-sm font-bold  py-1">
                 {option.title} {option.essential && <span className=" text-rose-500 text-xs">(필수 선택)</span>}
               </div>
@@ -93,19 +102,19 @@ function OptionModal({ menuId, modalHandler, table }: OptionModalPops) {
                 return (
                   <div className="w-full flex items-center text-xs py-1 cursor-pointer" key={i}>
                     <input
-                      id={'checkbox' + option.id + i}
+                      id={'checkbox' + option.categoryId + i}
                       type="checkbox"
                       className="w-4 h-4 accent-rose-500  cursor-pointer"
-                      checked={optionList.isSelected}
+                      checked={optionList.selected}
                       onChange={() => {
-                        dispatch(optionSelectedHandler({ optionId: option.id, index: i }));
+                        dispatch(optionSelectedHandler({ optionId: option.categoryId, index: i }));
                       }}
                     />
                     <label
-                      htmlFor={'checkbox' + option.id + i}
+                      htmlFor={'checkbox' + option.categoryId + i}
                       className="w-full flex items-center justify-between pl-1  cursor-pointer"
                       onChange={() => {
-                        dispatch(optionSelectedHandler({ optionId: option.id, index: i }));
+                        dispatch(optionSelectedHandler({ optionId: option.categoryId, index: i }));
                       }}
                     >
                       <div>{optionList.name}</div>
@@ -157,18 +166,33 @@ function OptionModal({ menuId, modalHandler, table }: OptionModalPops) {
           type="button"
           className="w-full p-2 text-white bg-rose-500 rounded-lg text-sm font-semibold"
           onClick={() => {
-            dispatch(
-              addCart({
-                table: table,
-                menuId: menuId,
-                name: menu.name,
-                options: selectedOptions,
-                img: menu.img,
-                price: totalPrice,
-                amount: amount,
+            publish(
+              JSON.stringify({
+                type: 'add',
+                cartDTO: {
+                  tableNo: table,
+                  storeId: storeId,
+                  menuId: menuId,
+                  name: menu.name,
+                  img: menu.menuImageUrl,
+                  options: selectedOptions,
+                  price: totalPrice,
+                  amount: amount,
+                },
               }),
             );
-            modalHandler('optionModalIsOpen', false);
+            // dispatch(
+            //   addCart({
+            //     table: table,
+            //     menuId: menuId,
+            //     name: menu.name,
+            //     options: selectedOptions,
+            //     img: menu.img,
+            //     price: totalPrice,
+            //     amount: amount,
+            //   }),
+            // );
+            // modalHandler('optionModalIsOpen', false);
           }}
         >
           {totalPrice.toLocaleString()}원 담기

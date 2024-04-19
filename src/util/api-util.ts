@@ -56,21 +56,22 @@ export const signupApi = async (userInform: Owner, isUserInform: IsUserInform, f
     return { status: 404 };
   }
   const formData = new FormData();
-  formData.append('businessNumberCertificateFile', businessReportCertificateFile);
+  formData.append('businessReportCertificateFile', businessReportCertificateFile);
   formData.append('businessRegistrationFile', businessRegistrationFile);
   formData.append('copyOfBankbookFile', copyOfBankbookFile);
-  const res = await axios.post('http://localhost:3000/signup', formData, {
+  const res = await axios.post('/api/image/ceo', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   });
+  console.log(res);
   return res.data;
 };
 
 export const documentDownloadApi = async (url: string) => {
   try {
     const response = await axios({
-      url: `http://localhost:3000/image/${url}`, // 파일 URL
+      url: `http://localhost:8080/image/${url}`, // 파일 URL
       method: 'GET',
       responseType: 'blob', // 서버로부터 받은 데이터가 Blob 형태임을 명시
     });
@@ -93,8 +94,8 @@ export const documentDownloadApi = async (url: string) => {
 
 export const singleImageUploadApi = async (file: File) => {
   const formData = new FormData();
-  formData.append('singleimage', file);
-  const res = await axios.post('http://localhost:3000/upload/single', formData, {
+  formData.append('menuImageFile', file);
+  const res = await axios.post('/api/menu/menuImages', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
