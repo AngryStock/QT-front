@@ -104,6 +104,8 @@ function Menu() {
           setOrderText('주문이 수락 되었습니다');
         } else if (newMessage.type === 'order' && newMessage.status === 'DONE') {
           setOrderText('준비가 완료 되었습니다');
+        } else if (newMessage.type === 'order' && newMessage.status === 'DENIED') {
+          setOrderText('주문이 거절 되었습니다');
         }
       });
     }
