@@ -62,7 +62,7 @@ export default function OwnerMain() {
 
   const connect = () => {
     client.current = new StompJs.Client({
-      brokerURL: `ws://localhost:8080/ws-stomp/websocket`, // 웹소켓 서버로 직접 접속
+      brokerURL: `ws://52.79.240.168:8080/ws-stomp/websocket`, // 웹소켓 서버로 직접 접속
       reconnectDelay: 5000,
       // webSocketFactory: () => new SockJS('/ws-stomp'), // proxy를 통한 접속
       heartbeatIncoming: 4000,
