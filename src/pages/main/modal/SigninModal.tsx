@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import axios from 'axios';
 import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 
 import { ServerApi, signupApi } from '@/util/functionapi-util';
@@ -167,8 +168,8 @@ function SigninModal({ modalHandler }: SigninModalProps) {
     handlePassword(value);
   };
   const businessnumberCertifactionHandler = async () => {
-    const res = await ServerApi.post(
-      'https:/.odcloud.kr/nts-businessman/v1/status?serviceKey=8MJVXZ2lsT1rIlmXy46ALToKu1C%2Fh6wE4OTpvs1x42lWE03elodgLCCSYY%2B%2Fr61YAPhrF%2FmyPMqvEiaVlBwC%2FA%3D%3D',
+    const res = await axios.post(
+      'https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=8MJVXZ2lsT1rIlmXy46ALToKu1C%2Fh6wE4OTpvs1x42lWE03elodgLCCSYY%2B%2Fr61YAPhrF%2FmyPMqvEiaVlBwC%2FA%3D%3D',
       { b_no: [userInform.businessNumber] },
     );
     if (res.data.data[0].b_stt_cd === '01') {

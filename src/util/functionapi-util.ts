@@ -75,7 +75,7 @@ export const signupApi = async (userInform: Owner, isUserInform: IsUserInform, f
 export const documentDownloadApi = async (url: string) => {
   try {
     const response = await axios({
-      url: `http://localhost:8080/image/${url}`, // 파일 URL
+      url: `/api/image/${url}`, // 파일 URL
       method: 'GET',
       responseType: 'blob', // 서버로부터 받은 데이터가 Blob 형태임을 명시
     });
