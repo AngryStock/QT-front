@@ -3,9 +3,10 @@ import { ModalHandler } from '@/pages/owner/component/MenuManagement';
 interface OrderCompleteModalPops {
   modalHandler: ModalHandler;
   table: string | undefined;
+  orderText: string;
 }
 
-function OrderCompleteModal({ modalHandler, table }: OrderCompleteModalPops) {
+function OrderCompleteModal({ modalHandler, table, orderText }: OrderCompleteModalPops) {
   return (
     <div className="absolute w-full h-full z-20 bg-white">
       <header className="w-full flex items-center justify-center h-12 border-b text-center">
@@ -14,7 +15,7 @@ function OrderCompleteModal({ modalHandler, table }: OrderCompleteModalPops) {
       <div className="w-full flex justify-center items-center" style={{ height: `calc(100% - 48px - 68px)` }}>
         <div className="p-4 flex flex-col gap-[10px] justify-center items-center">
           <div className="font-bold text-lg">테이블 {table}</div>
-          <div>주문이 완료 되었습니다.</div>
+          <div>{orderText}</div>
         </div>
       </div>
       <div className="w-full px-2 py-4 flex justify-center items-center custom_shadow">

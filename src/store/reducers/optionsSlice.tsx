@@ -23,7 +23,6 @@ export const optionsSlice = createSlice({
   initialState,
   reducers: {
     setOption(state, action) {
-      console.log(action.payload);
       return action.payload;
     },
     optionSelectedHandler(state, action) {

@@ -3,9 +3,10 @@ import { Menu, Orders, deleteOrder, setStatus } from '@/store/reducers/orderSlic
 
 interface WaitingOrderProps {
   waitingOrder: Orders[];
+  publish: (text: string) => void;
 }
 
-export default function WaitingOrder({ waitingOrder }: WaitingOrderProps) {
+export default function WaitingOrder({ waitingOrder, publish }: WaitingOrderProps) {
   const dispatch = useAppDispatch();
   const totalAmount = (menus: Menu[]) => {
     return menus.reduce((acc, menu) => acc + menu.amount, 0);
@@ -37,9 +38,13 @@ export default function WaitingOrder({ waitingOrder }: WaitingOrderProps) {
                         # {menu.name} {menu.amount}개
                       </div>
                       <div className="pl-3">
-                        {menu.options.map((option, i) => {
-                          return <div key={i}>ㄴ{option}</div>;
-                        })}
+                        {menu.options.length === 0 ? (
+                          <div key={i}>ㄴ선택안함</div>
+                        ) : (
+                          menu.options.map((option, i) => {
+                            return <div key={i}>ㄴ{option}</div>;
+                          })
+                        )}
                       </div>
                     </div>
                   );
@@ -49,6 +54,7 @@ export default function WaitingOrder({ waitingOrder }: WaitingOrderProps) {
                 <button
                   className="bg-slate-500 w-1/2 h-[101.25px] font-bold text-white text-lg"
                   onClick={() => {
+                    publish(JSON.stringify({ orderId: order.id, status: 'DENIED' }));
                     dispatch(deleteOrder(order.id));
                   }}
                 >
@@ -58,7 +64,8 @@ export default function WaitingOrder({ waitingOrder }: WaitingOrderProps) {
                 <button
                   className="bg-rose-500  w-1/2 h-[101.25px] font-bold text-white text-lg"
                   onClick={() => {
-                    dispatch(setStatus({ id: order.id, status: 'Preparing' }));
+                    publish(JSON.stringify({ orderId: order.id, status: 'ACCEPT' }));
+                    dispatch(setStatus({ id: order.id, status: 'ACCEPT' }));
                   }}
                 >
                   <div>주문</div>

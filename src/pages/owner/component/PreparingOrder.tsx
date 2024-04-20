@@ -3,9 +3,10 @@ import { Menu, Orders, setStatus } from '@/store/reducers/orderSlice';
 
 interface PreparingOrderProps {
   preparingOrder: Orders[];
+  publish: (text: string) => void;
 }
 
-export default function PreparingOrder({ preparingOrder }: PreparingOrderProps) {
+export default function PreparingOrder({ preparingOrder, publish }: PreparingOrderProps) {
   const dispatch = useAppDispatch();
   const totalAmount = (menus: Menu[]) => {
     return menus.reduce((acc, menu) => acc + menu.amount, 0);
@@ -49,7 +50,8 @@ export default function PreparingOrder({ preparingOrder }: PreparingOrderProps) 
                 <button
                   className="bg-rose-500  w-1/2 h-[101.25px] font-bold text-white text-lg"
                   onClick={() => {
-                    dispatch(setStatus({ id: order.id, status: 'Done' }));
+                    publish(JSON.stringify({ orderId: order.id, status: 'DONE' }));
+                    dispatch(setStatus({ id: order.id, status: 'DONE' }));
                   }}
                 >
                   <div>준비</div>

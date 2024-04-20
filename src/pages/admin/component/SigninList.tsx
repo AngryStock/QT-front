@@ -37,7 +37,6 @@ function SigninList() {
   const [owners, setOwners] = useState<Owners[]>([]);
   useEffect(() => {
     axios.get('/api/admin/joinInfos').then((res) => {
-      console.log(res.data);
       setOwners(res.data);
     });
   }, []);

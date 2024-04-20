@@ -152,7 +152,6 @@ function OptionEditModal({ modalHandler, menuId, name, setAdditionalType, setOpt
                       className="border rounded-lg border-slate-400 px-2 flex justify-center items-center"
                       onClick={() => {
                         setAdditionalType('option');
-                        console.log(option.categoryId);
                         setOptionId(option.categoryId);
                         modalHandler('contentsAddModalIsOpen', true);
                       }}

@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import * as StompJs from '@stomp/stompjs';
+import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/reducers/loginStateSlice';
+import { addOrder, setOrder } from '@/store/reducers/orderSlice';
 
 import MenuManagement from './component/MenuManagement';
 import Order from './component/Order';
@@ -23,6 +25,25 @@ export default function OwnerMain() {
     updateIsOpen[i] = !updateIsOpen[i];
     setIsOpen(updateIsOpen);
   };
+
+  useEffect(() => {
+    axios.get(`/api/order/find/storeId/${id}`).then((res) => {
+      dispatch(
+        setOrder(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          res.data.map((order: any) => ({
+            id: order.orderId,
+            table: order.table,
+            storeId: order.storeId,
+            price: order.price,
+            menus: order.menus,
+            status: order.status,
+            date: order.orderDate,
+          })),
+        ),
+      );
+    });
+  }, [dispatch, id]);
 
   const logout = () => {
     dispatch(login(null));
@@ -65,22 +86,33 @@ export default function OwnerMain() {
 
   const subscribe = () => {
     if (client.current) {
-      client.current.subscribe(`/sub/chat/room/${id}`, (message) => {
-        console.log(JSON.stringify(message.body));
-        // const newMessage = JSON.parse(message.body);
+      client.current.subscribe(`/sub/order/getOrder/storeId/${id}`, (message) => {
+        const newMessage = JSON.parse(message.body);
+        if (newMessage.type === 'order') {
+          dispatch(
+            addOrder({
+              id: newMessage.orderId,
+              table: newMessage.table,
+              storeId: newMessage.storeId,
+              status: newMessage.status,
+              price: newMessage.price,
+              menus: newMessage.menus,
+              date: newMessage.orderDate,
+            }),
+          );
+        }
       });
     }
   };
 
-  // const publish = (text: string) => {
-  //   e.preventDefault();
-  //   if (client.current && client.current.connected) {
-  //     client.current.publish({
-  //       destination: '/pub/chat/message',
-  //       body: text,
-  //     });
-  //   }
-  // };
+  const publish = (text: string) => {
+    if (client.current && client.current.connected) {
+      client.current.publish({
+        destination: `/pub/order/storeMessage`,
+        body: text,
+      });
+    }
+  };
 
   return (
     <div className="w-full h-full border-gray-700">
@@ -108,7 +140,7 @@ export default function OwnerMain() {
         </button>
       </header>
       <div className="w-full" style={{ height: 'calc(100% - 56px)' }}>
-        {isOpen[0] && <Order />}
+        {isOpen[0] && <Order publish={publish} />}
         {isOpen[1] && <Sales />}
         {isOpen[2] && <MenuManagement />}
       </div>

@@ -24,6 +24,7 @@ function Menu() {
   const client = useRef<StompJs.Client | null>(null);
   const [owner, setOwner] = useState({ name: '가게명' });
   const cart = useAppSelector((state) => state.cart);
+  const [orderText, setOrderText] = useState('');
 
   useEffect(() => {
     axios.get(`/api/category/find/storeId/${id}`).then((res1) => {
@@ -90,7 +91,6 @@ function Menu() {
   const subscribe = () => {
     if (client.current) {
       client.current.subscribe(`/sub/cart/table/${id}/${table}`, (message) => {
-        console.log(JSON.parse(message.body));
         const newMessage = JSON.parse(message.body);
         if (newMessage.type === 'add') {
           dispatch(addCart(newMessage.cartDTO));
@@ -100,6 +100,10 @@ function Menu() {
           dispatch(deleteCart(newMessage.cartId));
         } else if (newMessage.type === 'allDel') {
           dispatch(deleteAllCart());
+        } else if (newMessage.type === 'order' && newMessage.status === 'ACCEPT') {
+          setOrderText('주문이 수락 되었습니다');
+        } else if (newMessage.type === 'order' && newMessage.status === 'DONE') {
+          setOrderText('준비가 완료 되었습니다');
         }
       });
     }
@@ -113,14 +117,14 @@ function Menu() {
       });
     }
   };
-  // const order = (text: string) => {
-  //   if (client.current && client.current.connected) {
-  //     client.current.publish({
-  //       destination: `/sub/order/table/${id}/${table}`,
-  //       body: text,
-  //     });
-  //   }
-  // };
+  const order = (text: string) => {
+    if (client.current && client.current.connected) {
+      client.current.publish({
+        destination: `/pub/order/message`,
+        body: text,
+      });
+    }
+  };
 
   const modalHandler = (name: string, value: boolean) => {
     setModal((prevState) => ({
@@ -142,9 +146,19 @@ function Menu() {
         <OptionModal menuId={menuId} modalHandler={modalHandler} table={table} publish={publish} storeId={id} />
       )}
       {modal.cartModalIsOpen && (
-        <CartModal modalHandler={modalHandler} businessName={owner.name} table={table} publish={publish} />
+        <CartModal
+          modalHandler={modalHandler}
+          businessName={owner.name}
+          table={table}
+          publish={publish}
+          order={order}
+          storeId={id}
+          setOrderText={setOrderText}
+        />
       )}
-      {modal.orderCompleteModalIsOpen && <OrderCompleteModal modalHandler={modalHandler} table={table} />}
+      {modal.orderCompleteModalIsOpen && (
+        <OrderCompleteModal modalHandler={modalHandler} table={table} orderText={orderText} />
+      )}
       <header className="w-full flex items-center h-12 justify-center text-center">
         <div className="w-1/5 material-symbols-outlined cursor-pointer">search</div>
         <div className="w-3/5 font-bold ">{owner.name}</div>

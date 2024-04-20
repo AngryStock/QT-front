@@ -32,7 +32,6 @@ function LoginModal({ modalHandler }: LoginModalProps) {
       .then((res) => {
         if (res.status === 200) {
           axios.get('/api/currentStore').then((res) => {
-            console.log(res.data[0]);
             dispatch(login({ id: res.data[0].id }));
             toggleModal();
           });

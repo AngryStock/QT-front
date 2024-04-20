@@ -7,13 +7,17 @@ import DoneOrder from './DoneOrder';
 import PreparingOrder from './PreparingOrder';
 import WaitingOrder from './WaitingOrder';
 
-export default function Order() {
+interface OrderProps {
+  publish: (text: string) => void;
+}
+
+export default function Order({ publish }: OrderProps) {
   const [selectedTab, Setselected] = useState('주문대기');
   const tabNames = ['주문대기', '준비중', '주문완료'];
 
-  const waitingOrder = useAppSelector((state) => state.order).filter((order: Orders) => order.status === 'Waiting');
-  const preparingOrder = useAppSelector((state) => state.order).filter((order: Orders) => order.status === 'Preparing');
-  const doneOrder = useAppSelector((state) => state.order).filter((order: Orders) => order.status === 'Done');
+  const waitingOrder = useAppSelector((state) => state.order).filter((order: Orders) => order.status === 'WAIT');
+  const preparingOrder = useAppSelector((state) => state.order).filter((order: Orders) => order.status === 'ACCEPT');
+  const doneOrder = useAppSelector((state) => state.order).filter((order: Orders) => order.status === 'DONE');
 
   const tabNumber = [waitingOrder.length, preparingOrder.length, doneOrder.length];
 
@@ -36,8 +40,8 @@ export default function Order() {
         })}
       </div>
       <div className="h-full overflow-y-scroll" style={{ width: 'calc(100% - 112px)' }}>
-        {selectedTab === '주문대기' && <WaitingOrder waitingOrder={waitingOrder} />}
-        {selectedTab === '준비중' && <PreparingOrder preparingOrder={preparingOrder} />}
+        {selectedTab === '주문대기' && <WaitingOrder waitingOrder={waitingOrder} publish={publish} />}
+        {selectedTab === '준비중' && <PreparingOrder preparingOrder={preparingOrder} publish={publish} />}
         {selectedTab === '주문완료' && <DoneOrder doneOrder={doneOrder} />}
       </div>
     </div>

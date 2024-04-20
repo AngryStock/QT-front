@@ -181,18 +181,8 @@ function OptionModal({ menuId, modalHandler, table, publish, storeId }: OptionMo
                 },
               }),
             );
-            // dispatch(
-            //   addCart({
-            //     table: table,
-            //     menuId: menuId,
-            //     name: menu.name,
-            //     options: selectedOptions,
-            //     img: menu.img,
-            //     price: totalPrice,
-            //     amount: amount,
-            //   }),
-            // );
-            // modalHandler('optionModalIsOpen', false);
+
+            modalHandler('cartModalIsOpen', true);
           }}
         >
           {totalPrice.toLocaleString()}원 담기

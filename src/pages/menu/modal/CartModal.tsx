@@ -1,17 +1,20 @@
+import { Dispatch, SetStateAction } from 'react';
+
 import { ModalHandler } from '@/pages/owner/component/MenuManagement';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { Cart, deleteAllCart } from '@/store/reducers/cartSlice';
-import { addOrder } from '@/store/reducers/orderSlice';
+import { useAppSelector } from '@/store/hooks';
+import { Cart } from '@/store/reducers/cartSlice';
 
 interface CartModalPops {
   modalHandler: ModalHandler;
   businessName: string;
   table: string | undefined;
   publish: (text: string) => void;
+  order: (text: string) => void;
+  storeId: string | undefined;
+  setOrderText: Dispatch<SetStateAction<string>>;
 }
 
-function CartModal({ modalHandler, businessName, table, publish }: CartModalPops) {
-  const dispatch = useAppDispatch();
+function CartModal({ modalHandler, businessName, table, publish, order, storeId, setOrderText }: CartModalPops) {
   const cart: Cart[] = useAppSelector((state) => state.cart);
   const totalPrice = cart.reduce((totalPrice: number, cart: Cart) => totalPrice + cart.price * cart.amount, 0);
   const totalAmount = cart.reduce((totalAmount: number, cart: Cart) => totalAmount + cart.amount, 0);
@@ -125,10 +128,12 @@ function CartModal({ modalHandler, businessName, table, publish }: CartModalPops
         <button
           className="w-full p-2 text-white bg-rose-500 rounded-lg text-sm font-semibold flex justify-center items-center gap-2"
           onClick={() => {
-            dispatch(
-              addOrder({
+            order(
+              JSON.stringify({
+                status: 'wait',
                 table: table,
                 price: totalPrice,
+                storeId: storeId,
                 menus: cart.map((item) => ({
                   name: item.name,
                   options: item.options,
@@ -136,9 +141,10 @@ function CartModal({ modalHandler, businessName, table, publish }: CartModalPops
                 })),
               }),
             );
-            dispatch(deleteAllCart());
+            publish(JSON.stringify({ type: 'allDel' }));
             modalHandler('optionModalIsOpen', false);
             modalHandler('cartModalIsOpen', false);
+            setOrderText('주문이 완료 되었습니다.');
             modalHandler('orderCompleteModalIsOpen', true);
           }}
         >

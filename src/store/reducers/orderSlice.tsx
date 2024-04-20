@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { v4 as uuidv4 } from 'uuid';
 
 export interface Orders {
   id: string;
   table: string;
+  storeId: string;
   price: number;
   menus: Menu[];
   status: string;
@@ -16,21 +16,27 @@ export interface Menu {
   amount: number;
 }
 
+const initialState: Orders[] = [];
+
 export const orderSlice = createSlice({
   name: 'order',
-  initialState: [],
+  initialState,
   reducers: {
-    addOrder(state: Orders[], action) {
+    setOrder(state, action) {
+      return action.payload;
+    },
+    addOrder(state, action) {
       state.push({
-        id: uuidv4(),
+        id: action.payload.id,
         table: action.payload.table,
+        storeId: action.payload.storeId,
         price: action.payload.price,
         menus: action.payload.menus,
-        status: 'Waiting',
-        date: new Date().toISOString(),
+        status: action.payload.status,
+        date: action.payload.date,
       });
     },
-    deleteOrder(state: Orders[], action) {
+    deleteOrder(state, action) {
       const targetIndex = state.findIndex((state) => state.id === action.payload);
       state.splice(targetIndex, 1);
     },
@@ -43,6 +49,6 @@ export const orderSlice = createSlice({
   },
 });
 
-export const { addOrder, deleteOrder, setStatus } = orderSlice.actions;
+export const { addOrder, deleteOrder, setStatus, setOrder } = orderSlice.actions;
 
 export default orderSlice.reducer;

@@ -50,19 +50,19 @@ function SigninModal({ modalHandler }: SigninModalProps) {
   });
 
   const [userInform, setUserInform] = useState({
-    businessNumber: '2467100227',
-    ownerId: 'test',
-    password: 'didgmldlf12!@',
-    passwordCheck: 'didgmldlf12!@',
-    businessName: '양희일',
-    representativeName: '양희일',
-    representativeCellPhoneNumber: '01012341234',
-    storePhoneNumber: '01012341234',
-    email: 'myid7771@naver.com',
-    address: '서울시 강동구 고덕동 아리수로 246',
-    detailedAddress: '201',
-    bank: '우리은행',
-    accountNumber: '1002134456357',
+    businessNumber: '',
+    ownerId: '',
+    password: '',
+    passwordCheck: '',
+    businessName: '',
+    representativeName: '',
+    representativeCellPhoneNumber: '',
+    storePhoneNumber: '',
+    email: '',
+    address: '',
+    detailedAddress: '',
+    bank: '',
+    accountNumber: '',
   });
 
   const toggleModal = () => modalHandler('signinModalIsOpen', false);
@@ -107,7 +107,6 @@ function SigninModal({ modalHandler }: SigninModalProps) {
 
   const isOwnerIdAvailable = async () => {
     await axios.post('/api/available/ownerId', { ownerId: userInform.ownerId }).then((res) => {
-      console.log(res);
       if (res.data === '이미 존재하는 아이디입니다.') {
         userIsInformChangeHandler(['isOwnerId'], ['already']);
       } else {
@@ -117,7 +116,6 @@ function SigninModal({ modalHandler }: SigninModalProps) {
   };
 
   const fileChangeHandler = (files: { name: string; value: File | string }[]) => {
-    console.log(files);
     files.map(({ name, value }) => {
       setFiles((prevState) => ({
         ...prevState,

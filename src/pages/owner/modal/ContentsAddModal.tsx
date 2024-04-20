@@ -40,9 +40,7 @@ function ContentsAddModal({ modalHandler, additionalType, menuId, optionId }: Co
         // dispatch(addCategoryOfOptions({ optionCategoryNames: categoryText, menuId: menuId }));
       } else if (additionalType === 'option') {
         const optionNames = categoryText.split(',');
-        console.log(optionId, optionNames);
         await axios.post('/api/menuOption/add', { optionCategoryId: optionId, value: optionNames }).then((res) => {
-          console.log(res.data);
           dispatch(addOptionLists({ optionId: optionId, value: res.data }));
         });
       }
