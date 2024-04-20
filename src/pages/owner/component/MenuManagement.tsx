@@ -151,7 +151,7 @@ function MenuManagement() {
                             onMouseLeave={() => mouseHoveringHandler('')}
                           >
                             <img
-                              src={`/image/${menu.menuImageUrl}`}
+                              src={`/api/image/${menu.menuImageUrl}`}
                               className="w-[224px] h-[160px] rounded-lg mb-2 absolute"
                             />
                             {deleteHovering === `${menu.id}` && (

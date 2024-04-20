@@ -78,7 +78,7 @@ function SigninList() {
               </div>
               <div className="w-32 text-center flex flex-col gap-2">
                 <div className="w-full flex items-center justify-between">
-                  <Link to={`http://localhost:8080/image/${owner.businessRegistrationFileUrl}`} target="_blank">
+                  <Link to={`/api/image/${owner.businessRegistrationFileUrl}`} target="_blank">
                     사업자등록증
                   </Link>
                   <button
@@ -91,7 +91,7 @@ function SigninList() {
                   </button>
                 </div>
                 <div className="w-full flex items-center justify-between">
-                  <Link to={`http://localhost:8080/image/${owner.businessReportCertificateFileUrl}`} target="_blank">
+                  <Link to={`/api/image/${owner.businessReportCertificateFileUrl}`} target="_blank">
                     영업신고증
                   </Link>
                   <button
@@ -104,7 +104,7 @@ function SigninList() {
                   </button>
                 </div>
                 <div className="w-full flex items-center justify-between">
-                  <Link to={`http://localhost:8080/image/${owner.copyOfBankbookFileUrl}`} target="_blank">
+                  <Link to={`/api/image/${owner.copyOfBankbookFileUrl}`} target="_blank">
                     통장사본
                   </Link>
                   <button
