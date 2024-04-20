@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Category, deleteCategory, setCategory } from '@/store/reducers/categorysSlice';
 import { Menus, deleteMenu, setMenu } from '@/store/reducers/menusSlice';
+import { ServerApi } from '@/util/functionapi-util';
 
 import ContentsAddModal from '../modal/ContentsAddModal';
 import MenuEditModal from '../modal/MenuEditModal';
@@ -39,9 +39,9 @@ function MenuManagement() {
   const { id } = useParams();
 
   useEffect(() => {
-    axios.get(`/api/category/find/storeId/${id}`).then((res1) => {
+    ServerApi.get(`/category/find/storeId/${id}`).then((res1) => {
       dispatch(setCategory(res1.data));
-      axios.get(`/api/menu/find/storeId/${id}`).then((res2) => {
+      ServerApi.get(`/menu/find/storeId/${id}`).then((res2) => {
         dispatch(setMenu(res2.data));
       });
     });
@@ -128,7 +128,7 @@ function MenuManagement() {
                   <div
                     className="material-symbols-outlined"
                     onClick={() => {
-                      axios.get(`/api/category/delete/${category.id}`).then((res) => {
+                      ServerApi.get(`/category/delete/${category.id}`).then((res) => {
                         if (res.data.statusCode === 200) {
                           dispatch(deleteCategory(category.id));
                         }
@@ -151,7 +151,7 @@ function MenuManagement() {
                             onMouseLeave={() => mouseHoveringHandler('')}
                           >
                             <img
-                              src={`/api/image/${menu.menuImageUrl}`}
+                              src={`/image/${menu.menuImageUrl}`}
                               className="w-[224px] h-[160px] rounded-lg mb-2 absolute"
                             />
                             {deleteHovering === `${menu.id}` && (
@@ -167,7 +167,7 @@ function MenuManagement() {
                                 </button>
                                 <button
                                   onClick={() => {
-                                    axios.get(`/api/menu/delete/${menu.id}`).then((res) => {
+                                    ServerApi.get(`/menu/delete/${menu.id}`).then((res) => {
                                       if (res.data.statusCode === 200) {
                                         dispatch(deleteMenu(menu.id));
                                       }

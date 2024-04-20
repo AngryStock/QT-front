@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
 import * as StompJs from '@stomp/stompjs';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 import { Cart, addCart, deleteAllCart, deleteCart, setCart, setCartAmount } from '@/store/reducers/cartSlice';
 import { Category, setCategory } from '@/store/reducers/categorysSlice';
 import { Menus, setMenu } from '@/store/reducers/menusSlice';
+import { ServerApi } from '@/util/functionapi-util';
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 
@@ -27,23 +27,23 @@ function Menu() {
   const [orderText, setOrderText] = useState('');
 
   useEffect(() => {
-    axios.get(`/api/category/find/storeId/${id}`).then((res1) => {
+    ServerApi.get(`/category/find/storeId/${id}`).then((res1) => {
       dispatch(setCategory(res1.data));
-      axios.get(`/api/menu/find/storeId/${id}`).then((res2) => {
+      ServerApi.get(`/menu/find/storeId/${id}`).then((res2) => {
         dispatch(setMenu(res2.data));
       });
     });
-    axios.get(`/api/cart/find/storeId/${id}/table/${table}`).then((res) => {
+    ServerApi.get(`/cart/find/storeId/${id}/table/${table}`).then((res) => {
       dispatch(setCart(res.data));
     });
 
-    axios.get(`/api/store/find/${id}`).then((res) => {
+    ServerApi.get(`/store/find/${id}`).then((res) => {
       setOwner(res.data);
     });
   }, [dispatch, id, table]);
 
   useEffect(() => {
-    axios.get(`/api/cart/find/storeId/${id}/table/${table}`).then((res) => {
+    ServerApi.get(`/cart/find/storeId/${id}/table/${table}`).then((res) => {
       dispatch(setCart(res.data));
     });
   }, [dispatch, id, table]);
@@ -222,7 +222,7 @@ function Menu() {
                   }}
                 >
                   <img
-                    src={`/api/images/${menu.menuImageUrl}`}
+                    src={`/images/${menu.menuImageUrl}`}
                     alt={menu.name}
                     width={112}
                     height={80}
@@ -265,7 +265,7 @@ function Menu() {
                         </div>
                       </div>
                       <img
-                        src={`/api/image/${menu.menuImageUrl}`}
+                        src={`/image/${menu.menuImageUrl}`}
                         alt={menu.name}
                         className=" rounded-lg border h-[80px] w-[112px] bg-cover"
                       />

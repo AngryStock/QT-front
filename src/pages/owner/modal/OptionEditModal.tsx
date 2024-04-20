@@ -1,7 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
-import axios from 'axios';
-
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   Options,
@@ -11,6 +9,7 @@ import {
   deleteOptionList,
   setOption,
 } from '@/store/reducers/optionsSlice';
+import { ServerApi } from '@/util/functionapi-util';
 
 import { ModalHandler } from '../component/MenuManagement';
 
@@ -26,7 +25,7 @@ function OptionEditModal({ modalHandler, menuId, name, setAdditionalType, setOpt
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    axios.get(`/api/menuOption/find/menuId/CategoryAndOption/${menuId}`).then((res1) => {
+    ServerApi.get(`/menuOption/find/menuId/CategoryAndOption/${menuId}`).then((res1) => {
       dispatch(setOption(res1.data));
     });
 
@@ -161,7 +160,7 @@ function OptionEditModal({ modalHandler, menuId, name, setAdditionalType, setOpt
                     <div
                       className="material-symbols-outlined"
                       onClick={() => {
-                        axios.get(`/api/optionCategory/delete/${option.categoryId}`).then((res) => {
+                        ServerApi.get(`/optionCategory/delete/${option.categoryId}`).then((res) => {
                           if (res.data.statusCode === 200) {
                             dispatch(deleteCategoryOfOptions(option.categoryId));
                           }
@@ -199,7 +198,7 @@ function OptionEditModal({ modalHandler, menuId, name, setAdditionalType, setOpt
                             <div
                               className="material-symbols-outlined cursor-pointer"
                               onClick={() => {
-                                axios.get(`/api/menuOption/delete/${optionList.id}`).then((res) => {
+                                ServerApi.get(`/menuOption/delete/${optionList.id}`).then((res) => {
                                   if (res.data.statusCode === 200) {
                                     dispatch(deleteOptionList({ optionId: option.categoryId, index: i }));
                                   }
@@ -222,16 +221,14 @@ function OptionEditModal({ modalHandler, menuId, name, setAdditionalType, setOpt
             type="button"
             className="w-full bg-rose-500 rounded-lg h-10 flex justify-center items-center text-white"
             onClick={() => {
-              axios
-                .post(`/api/menuOption/update/CategoryAndOptions`, {
-                  categories: setCategories,
-                  menuOptions: setMenuOptions,
-                })
-                .then((res) => {
-                  if (res.data.statusCode === 200) {
-                    modalHandler('optionEditModalIsOpen', false);
-                  }
-                });
+              ServerApi.post(`/menuOption/update/CategoryAndOptions`, {
+                categories: setCategories,
+                menuOptions: setMenuOptions,
+              }).then((res) => {
+                if (res.data.statusCode === 200) {
+                  modalHandler('optionEditModalIsOpen', false);
+                }
+              });
             }}
           >
             설정 완료

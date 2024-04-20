@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 import { useAppDispatch } from '@/store/hooks';
 import { refuseSignup } from '@/store/reducers/ownersApprovalSlice';
-import { documentDownloadApi } from '@/util/api-util';
 import { approvalSendEmail, refuseSendEmail } from '@/util/email-util';
+import { ServerApi, documentDownloadApi } from '@/util/functionapi-util';
 
 interface Owners {
   accountNumber: string;
@@ -36,7 +35,7 @@ function SigninList() {
   const dispatch = useAppDispatch();
   const [owners, setOwners] = useState<Owners[]>([]);
   useEffect(() => {
-    axios.get('/api/admin/joinInfos').then((res) => {
+    ServerApi.get('/admin/joinInfos').then((res) => {
       setOwners(res.data);
     });
   }, []);
@@ -122,7 +121,7 @@ function SigninList() {
                 <button
                   className="bg-sky-500 rounded-lg px-2 py-1 text-white"
                   onClick={() => {
-                    axios.post(`/api/admin/approve/${owner.storeId}`).then(() => {
+                    ServerApi.post(`/admin/approve/${owner.storeId}`).then(() => {
                       approvalSendEmail(owner.email, owner.ceoName);
                       dispatch(refuseSignup(owner.storeId));
                     });

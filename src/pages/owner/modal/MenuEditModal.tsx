@@ -1,10 +1,8 @@
 import { useState } from 'react';
 
-import axios from 'axios';
-
 import { useAppDispatch } from '@/store/hooks';
 import { addMenu } from '@/store/reducers/menusSlice';
-import { singleImageUploadApi } from '@/util/api-util';
+import { ServerApi, singleImageUploadApi } from '@/util/functionapi-util';
 
 import { ModalHandler } from '../component/MenuManagement';
 
@@ -30,18 +28,16 @@ function MenuEditModal({ modalHandler, categoryId }: MenuEditModalProps) {
   const addMenuApiHandler = async () => {
     if (imageFile) {
       const res = await singleImageUploadApi(imageFile);
-      await axios
-        .post('/api/menu/save', {
-          categoryId: categoryId,
-          name: name,
-          description: description,
-          price: price,
-          menuImageUrl: res.menuImageFileUrl,
-        })
-        .then((res) => {
-          dispatch(addMenu(res.data));
-          modalHandler('menuEditModalIsOpen', false);
-        });
+      await ServerApi.post('/menu/save', {
+        categoryId: categoryId,
+        name: name,
+        description: description,
+        price: price,
+        menuImageUrl: res.menuImageFileUrl,
+      }).then((res) => {
+        dispatch(addMenu(res.data));
+        modalHandler('menuEditModalIsOpen', false);
+      });
     }
   };
 

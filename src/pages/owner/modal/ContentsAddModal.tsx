@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 import { useAppDispatch } from '@/store/hooks';
 import { addCategory } from '@/store/reducers/categorysSlice';
 import { addCategoryOfOptions, addOptionLists } from '@/store/reducers/optionsSlice';
+import { ServerApi } from '@/util/functionapi-util';
 
 import { ModalHandler } from '../component/MenuManagement';
 
@@ -29,18 +29,18 @@ function ContentsAddModal({ modalHandler, additionalType, menuId, optionId }: Co
     if (categoryText !== '') {
       if (additionalType === 'category') {
         const categroyNames = categoryText.split(',');
-        await axios.post('/api/category/add', { storeId: id, value: categroyNames }).then((res) => {
+        await ServerApi.post('/category/add', { storeId: id, value: categroyNames }).then((res) => {
           dispatch(addCategory(res.data));
         });
       } else if (additionalType === 'category of options') {
         const optionCategoryNames = categoryText.split(',');
-        await axios.post('/api/optionCategory/add', { menuId: menuId, value: optionCategoryNames }).then((res) => {
+        await ServerApi.post('/optionCategory/add', { menuId: menuId, value: optionCategoryNames }).then((res) => {
           dispatch(addCategoryOfOptions(res.data));
         });
         // dispatch(addCategoryOfOptions({ optionCategoryNames: categoryText, menuId: menuId }));
       } else if (additionalType === 'option') {
         const optionNames = categoryText.split(',');
-        await axios.post('/api/menuOption/add', { optionCategoryId: optionId, value: optionNames }).then((res) => {
+        await ServerApi.post('/menuOption/add', { optionCategoryId: optionId, value: optionNames }).then((res) => {
           dispatch(addOptionLists({ optionId: optionId, value: res.data }));
         });
       }

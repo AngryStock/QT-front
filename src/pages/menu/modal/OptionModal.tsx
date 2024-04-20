@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import axios from 'axios';
-
 import { ModalHandler } from '@/pages/owner/component/MenuManagement';
 import { Cart } from '@/store/reducers/cartSlice';
 import { Menus } from '@/store/reducers/menusSlice';
+import { ServerApi } from '@/util/functionapi-util';
 
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { OptionLists, Options, optionSelectedHandler, setOption } from '../../../store/reducers/optionsSlice';
@@ -24,7 +23,7 @@ function OptionModal({ menuId, modalHandler, table, publish, storeId }: OptionMo
   const options = useAppSelector((state) => state.options).filter((option: Options) => option.menuId === menuId);
 
   useEffect(() => {
-    axios.get(`/api/menuOption//find/menuId/CategoryAndOption/${menuId}`).then((res3) => {
+    ServerApi.get(`/menuOption//find/menuId/CategoryAndOption/${menuId}`).then((res3) => {
       dispatch(setOption(res3.data));
     });
   }, [menuId, dispatch]);
@@ -80,7 +79,7 @@ function OptionModal({ menuId, modalHandler, table, publish, storeId }: OptionMo
         </div>
       </header>
       <div className="w-full overflow-y-scroll" style={{ height: `calc(100% - 48px - 68px)` }}>
-        <img src={`/api/image/${menu.menuImageUrl}`} alt={menu.name} />
+        <img src={`/image/${menu.menuImageUrl}`} alt={menu.name} />
         <div className="w-full bg-gray-200 text-xs text-center text-gray-500">
           위 사진은 연출된 사진으로, 실제와 다를 수 있습니다.
         </div>

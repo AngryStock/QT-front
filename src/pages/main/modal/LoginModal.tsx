@@ -1,9 +1,8 @@
 import { useState } from 'react';
 
-import axios from 'axios';
-
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/reducers/loginStateSlice';
+import { ServerApi } from '@/util/functionapi-util';
 
 type ModalHandler = (name: string, value: boolean) => void;
 
@@ -23,20 +22,18 @@ function LoginModal({ modalHandler }: LoginModalProps) {
     const formData = new FormData();
     formData.append('username', ownerId);
     formData.append('password', password);
-    await axios
-      .post('/api/login', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          axios.get('/api/currentStore').then((res) => {
-            dispatch(login({ id: res.data[0].id }));
-            toggleModal();
-          });
-        }
-      });
+    await ServerApi.post('/login', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }).then((res) => {
+      if (res.status === 200) {
+        ServerApi.get('/currentStore').then((res) => {
+          dispatch(login({ id: res.data[0].id }));
+          toggleModal();
+        });
+      }
+    });
   };
 
   return (

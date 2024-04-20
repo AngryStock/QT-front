@@ -1,9 +1,8 @@
 import { useState } from 'react';
 
-import axios from 'axios';
 import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 
-import { signupApi } from '@/util/api-util';
+import { ServerApi, signupApi } from '@/util/functionapi-util';
 import { regenerateAddress } from '@/util/stringHelpers';
 
 type ModalHandler = (name: string, value: boolean) => void;
@@ -74,28 +73,27 @@ function SigninModal({ modalHandler }: SigninModalProps) {
       return;
     }
 
-    await axios
-      .post('/api/signup', {
-        ceo: {
-          name: userInform.representativeName,
-          mobileNumber: userInform.representativeCellPhoneNumber,
-          loginId: userInform.ownerId,
-          password: userInform.password,
-          bank: userInform.bank,
-          accountNumber: userInform.accountNumber,
-          email: userInform.email,
-          businessReportCertificateFileUrl: res.businessReportCertificateFileUrl,
-          businessRegistrationFileUrl: res.businessRegistrationFileUrl,
-          copyOfBankbookFileUrl: res.copyOfBankbookFileUrl,
-        },
-        store: {
-          name: userInform.businessName,
-          phoneNumber: userInform.storePhoneNumber,
-          mainAddress: userInform.address,
-          detailAddress: userInform.detailedAddress,
-          businessNumber: userInform.businessNumber,
-        },
-      })
+    await ServerApi.post('/signup', {
+      ceo: {
+        name: userInform.representativeName,
+        mobileNumber: userInform.representativeCellPhoneNumber,
+        loginId: userInform.ownerId,
+        password: userInform.password,
+        bank: userInform.bank,
+        accountNumber: userInform.accountNumber,
+        email: userInform.email,
+        businessReportCertificateFileUrl: res.businessReportCertificateFileUrl,
+        businessRegistrationFileUrl: res.businessRegistrationFileUrl,
+        copyOfBankbookFileUrl: res.copyOfBankbookFileUrl,
+      },
+      store: {
+        name: userInform.businessName,
+        phoneNumber: userInform.storePhoneNumber,
+        mainAddress: userInform.address,
+        detailAddress: userInform.detailedAddress,
+        businessNumber: userInform.businessNumber,
+      },
+    })
       .then(() => {
         toggleModal();
         modalHandler('submittedModalIsOpen', true);
@@ -106,7 +104,7 @@ function SigninModal({ modalHandler }: SigninModalProps) {
   };
 
   const isOwnerIdAvailable = async () => {
-    await axios.post('/api/available/ownerId', { ownerId: userInform.ownerId }).then((res) => {
+    await ServerApi.post('/available/ownerId', { ownerId: userInform.ownerId }).then((res) => {
       if (res.data === '이미 존재하는 아이디입니다.') {
         userIsInformChangeHandler(['isOwnerId'], ['already']);
       } else {
@@ -169,8 +167,8 @@ function SigninModal({ modalHandler }: SigninModalProps) {
     handlePassword(value);
   };
   const businessnumberCertifactionHandler = async () => {
-    const res = await axios.post(
-      'https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=8MJVXZ2lsT1rIlmXy46ALToKu1C%2Fh6wE4OTpvs1x42lWE03elodgLCCSYY%2B%2Fr61YAPhrF%2FmyPMqvEiaVlBwC%2FA%3D%3D',
+    const res = await ServerApi.post(
+      'https:/.odcloud.kr/nts-businessman/v1/status?serviceKey=8MJVXZ2lsT1rIlmXy46ALToKu1C%2Fh6wE4OTpvs1x42lWE03elodgLCCSYY%2B%2Fr61YAPhrF%2FmyPMqvEiaVlBwC%2FA%3D%3D',
       { b_no: [userInform.businessNumber] },
     );
     if (res.data.data[0].b_stt_cd === '01') {

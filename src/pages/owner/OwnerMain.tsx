@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import * as StompJs from '@stomp/stompjs';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/reducers/loginStateSlice';
 import { addOrder, setOrder } from '@/store/reducers/orderSlice';
+import { ServerApi } from '@/util/functionapi-util';
 
 import MenuManagement from './component/MenuManagement';
 import Order from './component/Order';
@@ -27,7 +27,7 @@ export default function OwnerMain() {
   };
 
   useEffect(() => {
-    axios.get(`/api/order/find/storeId/${id}`).then((res) => {
+    ServerApi.get(`/order/find/storeId/${id}`).then((res) => {
       dispatch(
         setOrder(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

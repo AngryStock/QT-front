@@ -3,6 +3,10 @@ import axios from 'axios';
 import { Files, IsUserInform } from '@/pages/main/modal/SigninModal';
 import { Owner } from '@/store/reducers/ownersSlice';
 
+export const ServerApi = axios.create({
+  baseURL: `http://52.79.240.168:8080`,
+});
+
 export const signupApi = async (userInform: Owner, isUserInform: IsUserInform, files: Files) => {
   const {
     isInputBusinessNumber,

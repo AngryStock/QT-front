@@ -52,7 +52,7 @@ function CartModal({ modalHandler, businessName, table, publish, order, storeId,
             return (
               <div className="w-full px-2 py-4 border-b border-slate-300" key={item.id}>
                 <div className="w-full gap-2 flex">
-                  <img src={`/api/image/${item.img}`} alt={item.name} className="rounded-lg w-[60px] h-[43px]" />
+                  <img src={`/image/${item.img}`} alt={item.name} className="rounded-lg w-[60px] h-[43px]" />
                   <div className="flex-grow">
                     <div className=" text-sm">{item.name}</div>
                     <div className="text-xs text-slate-500">{item.options.join(', ')}</div>
