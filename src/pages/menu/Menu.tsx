@@ -265,7 +265,7 @@ function Menu() {
                         </div>
                       </div>
                       <img
-                        src={`/image/${menu.menuImageUrl}`}
+                        src={`/api/image/${menu.menuImageUrl}`}
                         alt={menu.name}
                         className=" rounded-lg border h-[80px] w-[112px] bg-cover"
                       />
