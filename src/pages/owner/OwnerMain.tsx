@@ -8,6 +8,7 @@ import { login } from '@/store/reducers/loginStateSlice';
 import { addOrder, setOrder } from '@/store/reducers/orderSlice';
 import { ServerApi } from '@/util/functionapi-util';
 
+import IssueQrcode from './component/IssueQrcode';
 import MenuManagement from './component/MenuManagement';
 import Order from './component/Order';
 import Sales from './component/Sales';
@@ -143,6 +144,7 @@ export default function OwnerMain() {
         {isOpen[0] && <Order publish={publish} />}
         {isOpen[1] && <Sales />}
         {isOpen[2] && <MenuManagement />}
+        {isOpen[3] && <IssueQrcode />}
       </div>
     </div>
   );
